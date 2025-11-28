@@ -2582,7 +2582,7 @@
 
         <div class="urgency-badge">
           <span class="pulse"></span>
-          <span id="foundingSpotsLeft">847</span> founding spots left
+          <span id="foundingSpotsLeft">253</span> founding spots left
         </div>
 
         <h2 class="display">Become a Founding Member</h2>
@@ -2857,7 +2857,7 @@
 
     <div class="faq-item">
       <h3>When do you launch?</h3>
-      <p>January 1, 2026 in Toronto. First 1,000 founding members get 6 months free + $3.99/mo locked forever.</p>
+      <p>January 1, 2026 in Toronto. First 500 founding members get 6 months free + $3.99/mo locked forever.</p>
     </div>
   </div>
 </section>
@@ -2865,7 +2865,7 @@
 <section class="final-cta">
   <div class="final-cta-inner">
     <h2 class="display">Stop eating in the dark</h2>
-    <p>First 1,000 founding members get <strong class="founding-value">6 months FREE</strong> + <strong class="founding-value">$3.99/mo for life</strong>.<br><span id="waitlistCountBottom">247</span> spots already claimed.</p>
+    <p>First 500 founding members get <strong class="founding-value">6 months FREE</strong> + <strong class="founding-value">$3.99/mo for life</strong>.<br><span id="waitlistCountBottom">247</span> spots already claimed.</p>
 
     <div class="final-cta-form" id="finalForm">
       <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
@@ -4098,7 +4098,7 @@
       // Decrease founding spots
       const foundingEl = document.getElementById('foundingSpotsLeft');
       if (foundingEl) {
-        const currentSpots = parseInt(foundingEl.textContent) || 847;
+        const currentSpots = parseInt(foundingEl.textContent) || 253;
         if (currentSpots > 0) {
           foundingEl.textContent = Math.max(0, currentSpots - 1);
         }
@@ -4119,10 +4119,10 @@
     if (!foundingEl) return;
 
     // Calculate spots based on waitlist count
-    // 1000 founding spots - current signups = spots left
+    // 500 founding spots - current signups = spots left
     const waitlistEl = document.getElementById('waitlistCount');
     const currentSignups = parseInt(waitlistEl?.textContent) || 247;
-    const spotsLeft = Math.max(0, 1000 - currentSignups);
+    const spotsLeft = Math.max(0, 500 - currentSignups);
     foundingEl.textContent = spotsLeft;
   }
 
