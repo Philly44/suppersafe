@@ -559,22 +559,37 @@
     return code;
   }
 
-  // Signup
+  // Signup - All signup logic handled by Edge Function
   async function signUp(email) {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin }
-      });
-      if (error) throw error;
+      const referredBy = localStorage.getItem('suppersafe_referred_by') || null;
 
-      // Generate and save referral code
-      const code = generateCode();
-      localStorage.setItem('suppersafe_referral_code', code);
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/waitlist-signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          email,
+          turnstileToken: null,
+          referredBy
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Signup failed');
+      }
+
+      // Save to localStorage
+      localStorage.setItem('suppersafe_referral_code', data.referral_code);
+      localStorage.setItem('suppersafe_queue_position', data.queue_position);
       localStorage.setItem('suppersafe_unlocked', 'true');
       localStorage.setItem('suppersafe_qr_source', qrSource);
 
-      document.getElementById('referralCode').value = code;
+      document.getElementById('referralCode').value = data.referral_code;
       document.getElementById('formState').classList.add('hidden');
       document.getElementById('successState').classList.add('active');
     } catch (error) {

@@ -599,29 +599,20 @@
     btn.textContent = 'Looking up...';
 
     try {
-      // Query Supabase for user by email
-      const { data, error } = await supabase
-        .from('waitlist')
-        .select('referral_code, queue_position')
-        .eq('email', email)
-        .single();
+      // Query via Edge Function (secure - uses service role)
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/waitlist-lookup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({ email })
+      });
 
-      if (error) {
-        // Table might not exist or other error
-        if (error.code === '42P01' || error.message?.includes('does not exist')) {
-          errorEl.textContent = 'Lookup not available yet. Try the same browser you signed up on.';
-        } else if (error.code === 'PGRST116') {
-          errorEl.textContent = 'Email not found. Have you signed up?';
-        } else {
-          errorEl.textContent = 'Email not found. Have you signed up?';
-        }
-        btn.disabled = false;
-        btn.textContent = 'Find My Spot';
-        return;
-      }
+      const data = await response.json();
 
-      if (!data) {
-        errorEl.textContent = 'Email not found. Have you signed up?';
+      if (!response.ok) {
+        errorEl.textContent = data.error || 'Email not found. Have you signed up?';
         btn.disabled = false;
         btn.textContent = 'Find My Spot';
         return;
