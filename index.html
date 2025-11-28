@@ -2311,6 +2311,39 @@
       color: #A09A8F;
     }
 
+    .footer-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #A09A8F;
+    }
+
+    .footer-promise {
+      color: #6B665C;
+    }
+
+    .footer-divider {
+      color: #D4D0C8;
+    }
+
+    .footer-contact {
+      color: #A09A8F;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-contact:hover {
+      color: #6B665C;
+    }
+
+    @media (max-width: 600px) {
+      .footer-center {
+        order: 3;
+        margin-top: 4px;
+      }
+    }
+
     /* Sticky Mobile CTA */
     .sticky-cta {
       display: none;
@@ -2519,7 +2552,7 @@
           Continue with Google
         </button>
 
-        <p class="signup-fine">No spam. Unsubscribe anytime.</p>
+        <p class="signup-fine">No spam. No ads. Unsubscribe anytime.</p>
 
         <div class="divider"></div>
 
@@ -2808,6 +2841,11 @@
     <div class="footer-logo">
       <div class="logo-mark"><div class="logo-mark-inner"></div></div>
       <span class="logo-text">suppersafe</span>
+    </div>
+    <div class="footer-center">
+      <span class="footer-promise">No ads. Ever.</span>
+      <span class="footer-divider">·</span>
+      <a href="mailto:hello@suppersafe.com" class="footer-contact">hello@suppersafe.com</a>
     </div>
     <div class="footer-right">Toronto, 2026</div>
   </div>
