@@ -1182,6 +1182,23 @@
       color: #6B665C;
     }
 
+    .status-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .status-subtitle {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      color: #6B665C;
+    }
+
+    .status-subtitle:empty {
+      display: none;
+    }
+
     /* Main content */
     .report-content {
       padding: 24px;
@@ -2649,7 +2666,10 @@
 <template id="reportCardTemplate">
   <div class="report-card">
     <div class="report-status-bar" id="statusBar">
-      <span class="status-text" id="statusText">Pass</span>
+      <div class="status-info">
+        <span class="status-text" id="statusText">Pass</span>
+        <span class="status-subtitle" id="statusSubtitle"></span>
+      </div>
       <span class="status-date" id="statusDate">Inspected Jun 23, 2025</span>
     </div>
 
@@ -3504,6 +3524,9 @@
       const statusBar = document.getElementById('statusBar');
       statusBar.className = 'report-status-bar ' + (status === 'Pass' ? 'pass' : status === 'Conditional Pass' ? 'conditional' : 'closed');
       document.getElementById('statusText').textContent = status;
+      document.getElementById('statusSubtitle').textContent =
+        status === 'Closed' ? 'Ordered closed by health inspector' :
+        status === 'Conditional Pass' ? 'Passed with conditions to address' : '';
       document.getElementById('statusDate').textContent = latest?.date
         ? `Inspected ${new Date(latest.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}`
         : '';
