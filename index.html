@@ -43,6 +43,16 @@
       letter-spacing: -0.03em;
     }
 
+    /* Honeypot - hidden from humans, visible to bots */
+    .hp-field {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      opacity: 0;
+      pointer-events: none;
+      tab-index: -1;
+    }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -2488,6 +2498,7 @@
 
         <div class="error-message" id="errorMessage"></div>
         <input type="email" class="auth-input" id="emailInput" placeholder="Your email" required>
+        <input type="text" name="website" class="hp-field" id="hpMain" tabindex="-1" autocomplete="off">
         <button type="button" class="btn-primary" id="emailSubmit">Claim My Spot</button>
 
         <div class="auth-divider"><span>or</span></div>
@@ -2693,6 +2704,7 @@
     <p class="gate-subtitle">Join the waitlist for unlimited searches and real-time alerts when your restaurants get inspected.</p>
     <div class="gate-form">
       <input type="email" class="auth-input" id="gateEmail" placeholder="Your email">
+      <input type="text" name="company" class="hp-field" id="hpGate" tabindex="-1" autocomplete="off">
       <button type="button" class="btn-primary" id="gateSubmit">Get free access</button>
     </div>
     <p class="gate-fine"><span id="gateCount">247</span> people already on the list</p>
@@ -2759,6 +2771,7 @@
 
     <div class="final-cta-form" id="finalForm">
       <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
+      <input type="text" name="url" class="hp-field" id="hpFinal" tabindex="-1" autocomplete="off">
       <button type="button" class="btn-primary" id="finalSubmit">Claim My Spot</button>
     </div>
 
@@ -2769,6 +2782,7 @@
 <div class="sticky-cta" id="stickyCta">
   <div class="sticky-cta-inner">
     <input type="email" class="auth-input" id="stickyEmailInput" placeholder="Your email">
+    <input type="text" name="fax" class="hp-field" id="hpSticky" tabindex="-1" autocomplete="off">
     <button type="button" class="btn-primary" id="stickySubmit">Claim Spot</button>
   </div>
   <p class="sticky-cta-count"><span id="stickyCount">249</span> ahead of you · <strong class="founding-value">6 months FREE</strong></p>
@@ -2825,6 +2839,16 @@
       clearTimeout(timeout);
       timeout = setTimeout(() => func(...args), wait);
     };
+  }
+
+  // Honeypot check - returns true if bot detected
+  function isBot(honeypotId) {
+    const hp = document.getElementById(honeypotId);
+    if (hp && hp.value) {
+      console.warn('Bot detected via honeypot');
+      return true;
+    }
+    return false;
   }
 
   function showToast(msg) {
@@ -2997,6 +3021,7 @@
     document.getElementById('gateCount').textContent = document.getElementById('waitlistCount').textContent;
 
     document.getElementById('gateSubmit').addEventListener('click', async () => {
+      if (isBot('hpGate')) { closeModal(); showToast('You\'re in! Search away.'); return; }
       const email = document.getElementById('gateEmail').value.trim();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showToast('Please enter a valid email');
@@ -3773,6 +3798,7 @@
   }
 
   document.getElementById('emailSubmit').addEventListener('click', () => {
+    if (isBot('hpMain')) { showSuccess('Check your email to confirm.'); return; }
     const email = document.getElementById('emailInput').value.trim();
     if (!email) { showError('Enter your email'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Invalid email'); return; }
@@ -3782,6 +3808,7 @@
   });
 
   document.getElementById('finalSubmit').addEventListener('click', () => {
+    if (isBot('hpFinal')) { return; }
     const email = document.getElementById('finalEmailInput').value.trim();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
     document.getElementById('finalSubmit').disabled = true;
@@ -3841,6 +3868,7 @@
   window.addEventListener('scroll', handleScroll, { passive: true });
 
   document.getElementById('stickySubmit').addEventListener('click', () => {
+    if (isBot('hpSticky')) { return; }
     const email = document.getElementById('stickyEmailInput').value.trim();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
     document.getElementById('stickySubmit').disabled = true;
