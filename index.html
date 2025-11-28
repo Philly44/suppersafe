@@ -2315,6 +2315,10 @@
       display: none !important;
     }
 
+    .sticky-cta.search-active-hide {
+      transform: translateY(100%);
+    }
+
     .sticky-cta-inner {
       display: flex;
       gap: 10px;
@@ -2920,11 +2924,14 @@
   async function searchRestaurants(query) {
     if (query.length < 2) {
       searchResults.classList.remove('active');
+      stickyCta.classList.remove('search-active-hide');
       return;
     }
 
     searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
     searchResults.classList.add('active');
+    // Hide sticky CTA so it doesn't cover search results
+    stickyCta.classList.add('search-active-hide');
 
     try {
       const { data, error } = await supabase
@@ -2968,6 +2975,7 @@
 
   async function selectRestaurant(id, name, address) {
     searchResults.classList.remove('active');
+    stickyCta.classList.remove('search-active-hide');
     searchInput.value = '';
 
     // Check if gated
@@ -3654,6 +3662,7 @@
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-input-wrapper')) {
       searchResults.classList.remove('active');
+      stickyCta.classList.remove('search-active-hide');
     }
   });
 
