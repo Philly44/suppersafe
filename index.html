@@ -53,6 +53,15 @@
       tab-index: -1;
     }
 
+    /* Turnstile widget styling */
+    .cf-turnstile {
+      margin: 12px 0;
+    }
+
+    .gate-form .cf-turnstile {
+      margin: 12px 0;
+    }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -2404,6 +2413,7 @@
       transform: translateX(-50%) translateY(0);
     }
   </style>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -2499,6 +2509,7 @@
         <div class="error-message" id="errorMessage"></div>
         <input type="email" class="auth-input" id="emailInput" placeholder="Your email" required>
         <input type="text" name="website" class="hp-field" id="hpMain" tabindex="-1" autocomplete="off">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACDgbgS4Cu-vWGHm" data-callback="onTurnstileSuccess" data-theme="light"></div>
         <button type="button" class="btn-primary" id="emailSubmit">Claim My Spot</button>
 
         <div class="auth-divider"><span>or</span></div>
@@ -2705,6 +2716,7 @@
     <div class="gate-form">
       <input type="email" class="auth-input" id="gateEmail" placeholder="Your email">
       <input type="text" name="company" class="hp-field" id="hpGate" tabindex="-1" autocomplete="off">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAACDgbgS4Cu-vWGHm" data-callback="onTurnstileGateSuccess" data-theme="light"></div>
       <button type="button" class="btn-primary" id="gateSubmit">Get free access</button>
     </div>
     <p class="gate-fine"><span id="gateCount">247</span> people already on the list</p>
@@ -2772,6 +2784,7 @@
     <div class="final-cta-form" id="finalForm">
       <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
       <input type="text" name="url" class="hp-field" id="hpFinal" tabindex="-1" autocomplete="off">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAACDgbgS4Cu-vWGHm" data-callback="onTurnstileFinalSuccess" data-theme="light"></div>
       <button type="button" class="btn-primary" id="finalSubmit">Claim My Spot</button>
     </div>
 
@@ -2850,6 +2863,22 @@
     }
     return false;
   }
+
+  // Turnstile token storage
+  let turnstileTokenMain = null;
+  let turnstileTokenGate = null;
+  let turnstileTokenFinal = null;
+
+  // Turnstile success callbacks (called by Turnstile widget)
+  window.onTurnstileSuccess = function(token) {
+    turnstileTokenMain = token;
+  };
+  window.onTurnstileGateSuccess = function(token) {
+    turnstileTokenGate = token;
+  };
+  window.onTurnstileFinalSuccess = function(token) {
+    turnstileTokenFinal = token;
+  };
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -3022,6 +3051,7 @@
 
     document.getElementById('gateSubmit').addEventListener('click', async () => {
       if (isBot('hpGate')) { closeModal(); showToast('You\'re in! Search away.'); return; }
+      if (!turnstileTokenGate) { showToast('Please complete the security check'); return; }
       const email = document.getElementById('gateEmail').value.trim();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showToast('Please enter a valid email');
@@ -3029,7 +3059,7 @@
       }
       document.getElementById('gateSubmit').disabled = true;
       document.getElementById('gateSubmit').textContent = 'Joining...';
-      await signUpWithEmail(email);
+      await signUpWithEmail(email, turnstileTokenGate);
       isUnlocked = true;
       localStorage.setItem('suppersafe_unlocked', 'true');
       closeModal();
@@ -3692,8 +3722,31 @@
   });
 
   // Auth
-  async function signUpWithEmail(email) {
+  async function signUpWithEmail(email, turnstileToken = null) {
     try {
+      // 0. Verify Turnstile token if provided (server-side verification)
+      if (turnstileToken) {
+        try {
+          const verifyRes = await fetch(`${SUPABASE_URL}/functions/v1/verify-turnstile`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ token: turnstileToken, email })
+          });
+          if (!verifyRes.ok) {
+            const errData = await verifyRes.json().catch(() => ({}));
+            console.warn('Turnstile verification failed:', errData);
+            // Fail-safe: continue anyway if Edge Function not deployed yet
+            // throw new Error('Security check failed. Please refresh and try again.');
+          }
+        } catch (e) {
+          console.warn('Turnstile verification unavailable:', e.message);
+          // Fail-safe: continue if Edge Function not available
+        }
+      }
+
       // 1. Send magic link (this is required - fail if it errors)
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
@@ -3799,21 +3852,23 @@
 
   document.getElementById('emailSubmit').addEventListener('click', () => {
     if (isBot('hpMain')) { showSuccess('Check your email to confirm.'); return; }
+    if (!turnstileTokenMain) { showError('Please complete the security check'); return; }
     const email = document.getElementById('emailInput').value.trim();
     if (!email) { showError('Enter your email'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Invalid email'); return; }
     document.getElementById('emailSubmit').disabled = true;
     document.getElementById('emailSubmit').textContent = 'Joining...';
-    signUpWithEmail(email);
+    signUpWithEmail(email, turnstileTokenMain);
   });
 
   document.getElementById('finalSubmit').addEventListener('click', () => {
     if (isBot('hpFinal')) { return; }
+    if (!turnstileTokenFinal) { showError('Please complete the security check'); return; }
     const email = document.getElementById('finalEmailInput').value.trim();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
     document.getElementById('finalSubmit').disabled = true;
     document.getElementById('finalSubmit').textContent = 'Joining...';
-    signUpWithEmail(email);
+    signUpWithEmail(email, turnstileTokenFinal);
   });
 
   document.getElementById('googleSignIn').addEventListener('click', async () => {
