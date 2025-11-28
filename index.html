@@ -1,0 +1,3933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Suppersafe - Restaurant Health Alerts for Toronto</title>
+  <meta name="description" content="Real-time restaurant health inspection alerts for Toronto. Know about violations before you eat there.">
+  <meta property="og:title" content="Suppersafe - Know Before You Eat">
+  <meta property="og:description" content="That restaurant has health violations. You just don't know it yet.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    ::selection {
+      background: #2D5A3D;
+      color: white;
+    }
+
+    body {
+      font-family: 'Newsreader', Georgia, serif;
+      color: #1a1a1a;
+      background: #FAF9F7;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .display {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* Nav */
+    nav {
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-mark-inner {
+      width: 8px;
+      height: 8px;
+      background: #2D5A3D;
+      border-radius: 50%;
+    }
+
+    .logo-text {
+      font-size: 17px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .tag {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 4px;
+      background: #F5E6D3;
+      color: #8B6914;
+    }
+
+    /* Hero gradient background */
+    .hero-wrapper {
+      background: linear-gradient(180deg, #F5EDE4 0%, #FAF9F7 50%, #FAF9F7 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(45, 90, 61, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Hero - Balanced Layout */
+    .hero {
+      padding: 60px 32px 100px;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 60px;
+      align-items: start;
+      max-width: 1140px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    @media (max-width: 1000px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 32px 20px 100px;
+        gap: 32px;
+      }
+    }
+
+    .hero-secondary {
+      display: none;
+    }
+
+    .desktop-only {
+      display: block;
+    }
+
+    @media (max-width: 1000px) {
+      .desktop-only {
+        display: none !important;
+      }
+
+      .hero-secondary {
+        display: block;
+      }
+    }
+
+    .hero-eyebrow {
+      font-size: 14px;
+      color: #6B665C;
+      margin-bottom: 20px;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .eyebrow-icon {
+      width: 18px;
+      height: 18px;
+      background: #DC2626;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .eyebrow-icon::before {
+      content: '!';
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      font-size: 46px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 30px;
+        margin-bottom: 20px;
+      }
+      
+      .hero-eyebrow {
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+      
+      .hero-lead {
+        font-size: 17px !important;
+        margin-bottom: 16px !important;
+      }
+      
+      .hero-sub {
+        font-size: 15px !important;
+      }
+      
+      nav {
+        padding: 16px 20px;
+      }
+      
+      .tag {
+        font-size: 10px;
+        padding: 5px 8px;
+      }
+    }
+
+    .hero h1 span {
+      color: #2D5A3D;
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero h1 span::after {
+      content: '';
+      position: absolute;
+      left: -4px;
+      right: -4px;
+      bottom: 4px;
+      height: 10px;
+      background: rgba(45, 90, 61, 0.15);
+      z-index: -1;
+      animation: swipeHighlight 1s ease-out 0.5s forwards;
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    @keyframes swipeHighlight {
+      0% { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
+    }
+
+    .hero-lead {
+      font-size: 19px;
+      color: #4A4640;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: #6B665C;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    /* Search Box - Compact */
+    .restaurant-search {
+      background: white;
+      border: 1px solid #E8E4DD;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .restaurant-search {
+        padding: 16px;
+        margin: 0 -4px;
+      }
+    }
+
+    .search-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #2D5A3D;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .search-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #1a1a1a;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      border: 1.5px solid #D4D0C8;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: white;
+    }
+
+    .search-input:focus {
+      border-color: #2D5A3D;
+      box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.1);
+    }
+
+    .search-input::placeholder {
+      color: #A09A8F;
+    }
+
+    .search-hint {
+      font-size: 12px;
+      color: #A09A8F;
+      margin-top: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      border: 1px solid #E8E4DD;
+      border-radius: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      display: none;
+      background: white;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+
+    .search-results.active {
+      display: block;
+    }
+
+    .search-result-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #E8E4DD;
+      transition: background 0.15s ease;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-item:hover {
+      background: #F5F4F2;
+    }
+
+    .search-result-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+
+    .search-result-address {
+      font-size: 13px;
+      color: #6B665C;
+    }
+
+    .search-loading, .search-no-results {
+      padding: 20px 16px;
+      text-align: center;
+      color: #6B665C;
+      font-size: 14px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Steps - Below Search */
+    .steps-inline {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #E8E4DD;
+    }
+
+    @media (max-width: 600px) {
+      .steps-inline {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    .step-inline {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .step-num-inline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #2D5A3D;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-text-inline {
+      font-size: 13px;
+      color: #6B665C;
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.4;
+    }
+
+    /* Signup Card */
+    .signup-card {
+      background: white;
+      border: 1px solid #E8E4DD;
+      border-radius: 10px;
+      padding: 28px;
+      position: sticky;
+      top: 24px;
+    }
+
+    @media (max-width: 1000px) {
+      .signup-card {
+        position: static;
+        order: 2;
+      }
+
+      .hero-content {
+        order: 1;
+      }
+
+      .hero-secondary {
+        order: 3;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .signup-card {
+        padding: 20px;
+        margin: 0 -4px;
+      }
+
+      .signup-card h2 {
+        font-size: 20px;
+      }
+
+      .signup-desc {
+        font-size: 14px;
+      }
+
+      .btn-primary {
+        padding: 16px 24px;
+        font-size: 16px;
+        min-height: 52px; /* Touch target */
+      }
+
+      .stats-row {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .stats-row > div {
+        text-align: center !important;
+      }
+
+      /* Mobile countdown */
+      .countdown-wrapper {
+        padding: 14px 16px;
+        margin-bottom: 16px;
+      }
+
+      .countdown-value {
+        font-size: 22px;
+        min-width: 36px;
+      }
+
+      .countdown-separator {
+        font-size: 18px;
+      }
+
+      .countdown-unit-label {
+        font-size: 9px;
+      }
+
+      /* Mobile urgency badge */
+      .urgency-badge {
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+
+      /* Mobile referral section */
+      .referral-box {
+        padding: 14px;
+      }
+
+      .referral-code-wrapper {
+        flex-direction: column;
+      }
+
+      .referral-code-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+      }
+
+      .referral-copy-btn {
+        padding: 12px 20px;
+        min-height: 44px;
+      }
+
+      .referral-share-btns .share-btn {
+        width: 48px;
+        height: 48px;
+        min-height: 48px; /* Touch target */
+      }
+
+      .queue-position {
+        padding: 12px 14px;
+      }
+
+      .queue-number {
+        font-size: 20px;
+      }
+    }
+
+    .signup-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #2D5A3D;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .signup-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .signup-desc {
+      font-size: 14px;
+      color: #6B665C;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      border: 1.5px solid #D4D0C8;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: white;
+      margin-bottom: 10px;
+    }
+
+    .auth-input:focus {
+      border-color: #2D5A3D;
+      box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.1);
+    }
+
+    .auth-input::placeholder {
+      color: #A09A8F;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: #F97316;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.01em;
+      box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #EA580C;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+    }
+
+    /* Countdown Timer */
+    .countdown-wrapper {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2D5A3D 100%);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .countdown-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .countdown-timer {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .countdown-unit {
+      text-align: center;
+    }
+
+    .countdown-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      line-height: 1;
+      min-width: 44px;
+    }
+
+    .countdown-unit-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+
+    .countdown-separator {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    /* Urgency badge */
+    .urgency-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #DC2626;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .urgency-badge .pulse {
+      width: 8px;
+      height: 8px;
+      background: #DC2626;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Live counter animation */
+    .live-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      min-width: 8px;
+      min-height: 8px;
+      background: #10B981;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+      }
+    }
+
+    .counter-value {
+      transition: transform 0.3s ease;
+    }
+
+    .counter-value.bump {
+      animation: counterBump 0.3s ease;
+    }
+
+    @keyframes counterBump {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Founding member highlight */
+    .founding-value {
+      color: #F97316;
+      font-weight: 700;
+    }
+
+    .price-crossed {
+      text-decoration: line-through;
+      color: #A09A8F;
+      font-size: 14px;
+    }
+
+    /* Referral Section */
+    .referral-section {
+      margin-top: 20px;
+    }
+
+    .queue-position {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2D5A3D 100%);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .queue-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .queue-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .referral-box {
+      background: #FAF9F7;
+      border: 1px solid #E8E4DD;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .referral-cta {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: #4A4640;
+      margin-bottom: 12px;
+    }
+
+    .referral-cta strong {
+      color: #F97316;
+    }
+
+    .referral-code-wrapper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .referral-code-input {
+      flex: 1;
+      padding: 10px 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: white;
+      border: 1.5px solid #D4D0C8;
+      border-radius: 6px;
+      text-align: center;
+      color: #1a1a1a;
+    }
+
+    .referral-copy-btn {
+      padding: 10px 16px;
+      background: #2D5A3D;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .referral-copy-btn:hover {
+      background: #234A31;
+    }
+
+    .referral-copy-btn.copied {
+      background: #059669;
+    }
+
+    .referral-share-btns {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .referral-share-btns .share-btn {
+      flex: none;
+      width: 44px;
+      padding: 10px;
+    }
+
+    .referral-stats {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+    }
+
+    .referral-stats span {
+      font-weight: 600;
+      color: #2D5A3D;
+    }
+
+    .waitlist-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E8E4DD;
+      font-size: 14px;
+      color: #2D5A3D;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .waitlist-link:hover {
+      color: #F97316;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .signup-fine {
+      font-size: 12px;
+      color: #A09A8F;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: #D4D0C8;
+      margin: 20px auto;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #6B665C;
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #A09A8F;
+    }
+
+    /* Error message */
+    .error-message {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #991B1B;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .error-message.active {
+      display: block;
+    }
+
+    /* Success state */
+    .success-state {
+      text-align: center;
+      padding: 16px 0;
+      display: none;
+    }
+
+    .success-state.active {
+      display: block;
+    }
+
+    .form-state.hidden {
+      display: none;
+    }
+
+    .success-icon {
+      width: 36px;
+      height: 36px;
+      border: 2px solid #2D5A3D;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .success-icon-inner {
+      width: 10px;
+      height: 10px;
+      background: #2D5A3D;
+      border-radius: 50%;
+    }
+
+    .success-state h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .success-state p {
+      color: #6B665C;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .success-state .fine {
+      font-size: 12px;
+      color: #A09A8F;
+    }
+
+    /* Auth divider */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #E8E4DD;
+    }
+
+    .auth-divider span {
+      font-size: 12px;
+      color: #A09A8F;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-google {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: white;
+      color: #1a1a1a;
+      border: 1.5px solid #D4D0C8;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-google:hover {
+      background: #F9FAFB;
+      border-color: #9CA3AF;
+    }
+
+    .btn-google svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ===========================================
+       MODAL OVERLAY - REPORT CARD
+       =========================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      width: 100%;
+      max-width: 440px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .report-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Status bar */
+    .report-status-bar {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .report-status-bar.pass {
+      background: #ECFDF5;
+    }
+
+    .report-status-bar.conditional {
+      background: #FFFBEB;
+    }
+
+    .report-status-bar.closed {
+      background: #FEF2F2;
+    }
+
+    .status-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .report-status-bar.pass .status-text { color: #059669; }
+    .report-status-bar.conditional .status-text { color: #D97706; }
+    .report-status-bar.closed .status-text { color: #DC2626; }
+
+    .status-date {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+    }
+
+    /* Main content */
+    .report-content {
+      padding: 24px;
+    }
+
+    .report-header {
+      margin-bottom: 20px;
+    }
+
+    .report-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .report-address {
+      font-size: 14px;
+      color: #6B665C;
+    }
+
+    /* Violation hero */
+    .violation-hero {
+      background: #FAF9F7;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .violation-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .violation-number.clean { color: #059669; }
+    .violation-number.warning { color: #D97706; }
+    .violation-number.danger { color: #DC2626; }
+
+    .violation-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #6B665C;
+      margin-bottom: 16px;
+    }
+
+    .severity-breakdown {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .severity-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid #E8E4DD;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+    }
+
+    .severity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .severity-dot.crucial { background: #DC2626; }
+    .severity-dot.significant { background: #D97706; }
+    .severity-dot.minor { background: #9CA3AF; }
+
+    /* What they found */
+    .findings-section {
+      background: #FAF9F7;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .findings-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #6B665C;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .finding-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #E8E4DD;
+    }
+
+    .finding-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .finding-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .finding-text {
+      font-size: 13px;
+      color: #4A4640;
+      line-height: 1.4;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .finding-more {
+      font-size: 12px;
+      color: #6B665C;
+      font-family: 'Space Grotesk', sans-serif;
+      padding-top: 8px;
+      font-style: italic;
+    }
+
+    /* History section */
+    .history-section {
+      margin-bottom: 20px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .history-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #6B665C;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    .history-count {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #A09A8F;
+    }
+
+    .trend-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 32px;
+      margin-bottom: 10px;
+    }
+
+    .trend-bar {
+      flex: 1;
+      background: #E8E4DD;
+      border-radius: 2px;
+      min-height: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .trend-bar.clean { background: #34D399; }
+    .trend-bar.warning { background: #FBBF24; }
+    .trend-bar.danger { background: #F87171; }
+
+    .trend-bar:last-child {
+      outline: 2px solid #2D5A3D;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .history-insight {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: #4A4640;
+      line-height: 1.5;
+      background: #FEF3C7;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border-left: 3px solid #F59E0B;
+    }
+
+    .history-insight strong {
+      color: #92400E;
+    }
+
+    .history-insight.positive {
+      background: #ECFDF5;
+      border-left-color: #10B981;
+    }
+
+    .history-insight.positive strong {
+      color: #065F46;
+    }
+
+    .history-insight.neutral {
+      background: #F5F4F2;
+      border-left-color: #9CA3AF;
+    }
+
+    .history-insight.neutral strong {
+      color: #4B5563;
+    }
+
+    /* Share section */
+    .share-section {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .share-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 8px;
+      border-radius: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .share-btn:hover { opacity: 0.9; }
+    .share-btn:active { transform: scale(0.97); }
+    .share-btn svg { width: 14px; height: 14px; }
+
+    .share-btn.twitter { background: #1DA1F2; color: white; }
+    .share-btn.whatsapp { background: #25D366; color: white; }
+    .share-btn.copy {
+      background: #FAF9F7;
+      color: #4A4640;
+      border: 1px solid #E8E4DD;
+    }
+    .share-btn.copy.copied {
+      background: #ECFDF5;
+      border-color: #A7F3D0;
+      color: #059669;
+    }
+
+    /* CTA */
+    .report-cta {
+      width: 100%;
+      padding: 14px;
+      background: #2D5A3D;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .report-cta:hover { background: #234A31; }
+    .report-cta svg { width: 16px; height: 16px; }
+
+    /* Footer */
+    .report-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E8E4DD;
+    }
+
+    .report-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .report-brand-mark {
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid #A09A8F;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .report-brand-mark-inner {
+      width: 4px;
+      height: 4px;
+      background: #2D5A3D;
+      border-radius: 50%;
+    }
+
+    .report-brand-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      color: #A09A8F;
+    }
+
+    .report-close {
+      background: none;
+      border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+      cursor: pointer;
+      padding: 8px 12px;
+      margin: -8px -12px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .report-close:hover {
+      background: #F5F4F2;
+      color: #1a1a1a;
+    }
+
+    .data-source {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px;
+      color: #A09A8F;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    /* ===========================================
+       SAFETY SCORE REVEAL SYSTEM
+       =========================================== */
+
+    /* Loading state - suspense phase */
+    .score-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      min-height: 200px;
+    }
+
+    .score-loading-icon {
+      width: 64px;
+      height: 64px;
+      border: 3px solid #E8E4DD;
+      border-top-color: #2D5A3D;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .score-loading-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #6B665C;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Safety Score Hero Section */
+    .safety-score-hero {
+      background: linear-gradient(135deg, #FAF9F7 0%, #F5F4F2 100%);
+      border-radius: 16px;
+      padding: 28px 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .safety-score-hero.revealing {
+      animation: heroReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes heroReveal {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Score circle */
+    .score-circle-wrapper {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 16px;
+    }
+
+    .score-circle-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .score-circle-ring {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--score-color) calc(var(--score-percent) * 3.6deg),
+        #E8E4DD calc(var(--score-percent) * 3.6deg)
+      );
+      transition: background 0.5s ease;
+    }
+
+    .score-circle-inner {
+      position: absolute;
+      inset: 14px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-number-main {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--score-color);
+      opacity: 0;
+      filter: blur(8px);
+      transform: scale(0.9);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .score-number-main.revealed {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+
+    .score-number-main.counting {
+      animation: countPulse 0.1s ease-out;
+    }
+
+    @keyframes countPulse {
+      0% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .score-out-of {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #A09A8F;
+      margin-top: 2px;
+    }
+
+    /* Score label */
+    .score-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+    }
+
+    .score-label.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .score-label.excellent { color: #059669; }
+    .score-label.good { color: #10B981; }
+    .score-label.fair { color: #D97706; }
+    .score-label.poor { color: #F97316; }
+    .score-label.critical { color: #DC2626; }
+
+    /* Percentile comparison */
+    .score-percentile {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #4A4640;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+    }
+
+    .score-percentile.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .score-percentile strong {
+      color: var(--score-color);
+    }
+
+    /* Celebration mode for clean restaurants */
+    .safety-score-hero.celebration {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+    }
+
+    .celebration-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid #A7F3D0;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #059669;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s;
+    }
+
+    .celebration-badge.revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Warning mode for bad scores */
+    .safety-score-hero.warning {
+      background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
+    }
+
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid #FECACA;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #DC2626;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s;
+    }
+
+    .warning-badge.revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ===========================================
+       TIERED CELEBRATION ANIMATIONS
+       =========================================== */
+
+    /* Tier 2: Good (80-89) - Green glow pulse */
+    @keyframes glowPulseGreen {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+      50% {
+        box-shadow: 0 0 20px 8px rgba(16, 185, 129, 0.4);
+      }
+    }
+
+    .score-circle-wrapper.glow-green {
+      animation: glowPulseGreen 0.6s ease-in-out 2;
+    }
+
+    /* Tier 3: Fair (70-79) - Yellow pulse */
+    @keyframes glowPulseYellow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+      }
+      50% {
+        box-shadow: 0 0 15px 5px rgba(251, 191, 36, 0.3);
+      }
+    }
+
+    .score-circle-wrapper.glow-yellow {
+      animation: glowPulseYellow 0.8s ease-in-out 1;
+    }
+
+    /* Tier 4: Needs Work (60-69) - Orange pulse */
+    @keyframes glowPulseOrange {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+      }
+      50% {
+        box-shadow: 0 0 15px 5px rgba(249, 115, 22, 0.3);
+      }
+    }
+
+    .score-circle-wrapper.glow-orange {
+      animation: glowPulseOrange 1s ease-in-out 2;
+    }
+
+    /* Tier 5: Critical (<60) - Share section highlight */
+    @keyframes shareSectionPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
+      50% {
+        box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+      }
+    }
+
+    .share-section-enhanced.highlight-warning {
+      animation: shareSectionPulse 1s ease-out 1;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    /* Critical score hero red fade */
+    .safety-score-hero.critical-fade {
+      animation: criticalFadeIn 2.5s ease-out forwards;
+    }
+
+    @keyframes criticalFadeIn {
+      0% {
+        background: linear-gradient(135deg, #FAF9F7 0%, #F5F4F2 100%);
+      }
+      100% {
+        background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
+      }
+    }
+
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .glow-green,
+      .glow-yellow,
+      .glow-orange {
+        animation: none !important;
+      }
+
+      .safety-score-hero.revealed,
+      .score-circle.revealed,
+      .score-number-main.revealed {
+        filter: none !important;
+        transition: none !important;
+        transform: none !important;
+      }
+
+      .score-number-main {
+        animation: none !important;
+      }
+
+      .celebration-badge.revealed,
+      .warning-badge.revealed {
+        transition: none !important;
+      }
+
+      .safety-score-hero.critical-fade {
+        animation: none !important;
+        background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
+      }
+
+      .share-section-enhanced.highlight-warning {
+        animation: none !important;
+      }
+
+      .live-dot {
+        animation: none !important;
+      }
+    }
+
+    /* Share section enhancement */
+    .share-section-enhanced {
+      background: #FAF9F7;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .share-header {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .share-header svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .share-subtext {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+      margin-bottom: 12px;
+    }
+
+    .share-buttons-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Visceral violation descriptions */
+    .finding-item.crucial {
+      background: #FEF2F2;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 4px 0;
+      border-left: 3px solid #DC2626;
+    }
+
+    .finding-item.significant {
+      background: #FFFBEB;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 4px 0;
+      border-left: 3px solid #F59E0B;
+    }
+
+    .finding-severity-tag {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: auto;
+    }
+
+    .finding-severity-tag.crucial {
+      background: #DC2626;
+      color: white;
+    }
+
+    .finding-severity-tag.significant {
+      background: #F59E0B;
+      color: white;
+    }
+
+    /* ===========================================
+       GATE MODAL - EMAIL CAPTURE
+       =========================================== */
+    .gate-modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 100%;
+      animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gate-emoji {
+      margin-bottom: 16px;
+      color: #6B665C;
+    }
+
+    .gate-emoji svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .gate-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+
+    .gate-subtitle {
+      font-size: 15px;
+      color: #6B665C;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .gate-form {
+      margin-bottom: 16px;
+    }
+
+    .gate-form .auth-input {
+      margin-bottom: 12px;
+    }
+
+    .gate-fine {
+      font-size: 12px;
+      color: #A09A8F;
+      margin-bottom: 20px;
+    }
+
+    .gate-fine span {
+      color: #2D5A3D;
+      font-weight: 600;
+    }
+
+    .gate-skip {
+      background: none;
+      border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: #6B665C;
+      cursor: pointer;
+      padding: 8px 16px;
+      transition: color 0.15s ease;
+    }
+
+    .gate-skip:hover {
+      color: #1a1a1a;
+    }
+
+    /* Features section */
+    .features {
+      background: #2D5A3D;
+      color: white;
+      padding: 70px 32px;
+    }
+
+    .features-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.7;
+      margin-bottom: 14px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      
+      .features {
+        padding: 50px 20px;
+      }
+    }
+
+    .feature h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .feature p {
+      font-size: 15px;
+      opacity: 0.85;
+      line-height: 1.6;
+    }
+
+    /* Problem section */
+    .problem {
+      padding: 70px 32px;
+      background: #FAF9F7;
+    }
+    
+    @media (max-width: 600px) {
+      .problem {
+        padding: 50px 20px;
+      }
+      
+      .problem h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+      
+      .problem-text {
+        font-size: 15px;
+      }
+    }
+
+    .problem-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .problem h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      font-size: 28px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .problem-text {
+      font-size: 17px;
+      color: #4A4640;
+      line-height: 1.8;
+    }
+
+    .problem-text p {
+      margin-bottom: 20px;
+    }
+
+    .problem-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* FAQ section */
+    .faq {
+      padding: 70px 32px;
+      background: white;
+      border-top: 1px solid #E8E4DD;
+    }
+    
+    @media (max-width: 600px) {
+      .faq {
+        padding: 50px 20px;
+      }
+      
+      .faq h2 {
+        font-size: 18px;
+        margin-bottom: 28px;
+      }
+      
+      .faq-item h3 {
+        font-size: 15px;
+      }
+      
+      .faq-item p {
+        font-size: 14px;
+      }
+    }
+
+    .faq-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .faq h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      margin-bottom: 36px;
+    }
+
+    .faq-item {
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #E8E4DD;
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .faq-item h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .faq-item p {
+      font-size: 15px;
+      color: #6B665C;
+      line-height: 1.7;
+    }
+
+    /* Final CTA */
+    .final-cta {
+      padding: 70px 32px;
+      background: #FAF9F7;
+      text-align: center;
+      border-top: 1px solid #E8E4DD;
+    }
+    
+    @media (max-width: 600px) {
+      .final-cta {
+        padding: 50px 20px 120px;
+      }
+      
+      .final-cta h2 {
+        font-size: 24px;
+      }
+      
+      .final-cta > p {
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .final-cta-inner {
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .final-cta h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .final-cta > p {
+      font-size: 16px;
+      color: #6B665C;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .final-cta-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    @media (max-width: 500px) {
+      .final-cta-form {
+        flex-direction: column;
+      }
+    }
+
+    .final-cta-form .auth-input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .final-cta-form .btn-primary {
+      width: auto;
+      padding: 14px 24px;
+    }
+
+    .final-success {
+      color: #2D5A3D;
+      font-weight: 500;
+      display: none;
+    }
+
+    .final-success.active {
+      display: block;
+    }
+
+    .final-cta-form.hidden {
+      display: none;
+    }
+
+    /* Footer */
+    footer {
+      padding: 36px 32px;
+      border-top: 1px solid #E8E4DD;
+      background: #FAF9F7;
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        padding: 28px 20px;
+      }
+      
+      .footer-inner {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+    }
+
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-logo .logo-mark {
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid #6B665C;
+    }
+
+    .footer-logo .logo-mark-inner {
+      width: 6px;
+      height: 6px;
+      background: #6B665C;
+    }
+
+    .footer-logo .logo-text {
+      font-size: 14px;
+      color: #6B665C;
+    }
+
+    .footer-right {
+      font-size: 13px;
+      color: #A09A8F;
+    }
+
+    /* Sticky Mobile CTA */
+    .sticky-cta {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sticky-cta.visible {
+      transform: translateY(0);
+    }
+
+    .sticky-cta.hidden-complete {
+      display: none !important;
+    }
+
+    .sticky-cta-inner {
+      display: flex;
+      gap: 10px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .sticky-cta .auth-input {
+      flex: 1;
+      padding: 12px 14px;
+      font-size: 16px;
+      margin-bottom: 0;
+      min-width: 0;
+    }
+
+    .sticky-cta .btn-primary {
+      padding: 12px 18px;
+      font-size: 14px;
+      white-space: nowrap;
+      width: auto;
+    }
+
+    .sticky-cta-count {
+      font-size: 11px;
+      color: #6B665C;
+      text-align: center;
+      margin-top: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .sticky-cta-count span {
+      font-weight: 600;
+      color: #2D5A3D;
+    }
+
+    @media (max-width: 1000px) {
+      .sticky-cta {
+        display: block;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .sticky-cta-inner {
+        flex-direction: column;
+      }
+
+      .sticky-cta .btn-primary {
+        width: 100%;
+      }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 3000;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero-wrapper">
+  <nav>
+    <div class="logo">
+      <div class="logo-mark">
+        <div class="logo-mark-inner"></div>
+      </div>
+      <span class="logo-text">suppersafe</span>
+    </div>
+    <div class="tag">Coming to Toronto</div>
+  </nav>
+
+  <main class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow"><span class="eyebrow-icon"></span>4 million Canadians get food poisoning every year.</p>
+      
+      <h1>That restaurant has 3 health violations. <span>You just don't know it yet.</span></h1>
+      
+      <p class="hero-lead">Get alerts when your favourite Toronto restaurants fail health inspections. In plain English. Within hours.</p>
+      
+      <p class="hero-sub">Last month, 47 Toronto restaurants got critical violations. Some of them are places you eat at.</p>
+
+      <div class="restaurant-search">
+        <p class="search-label">Try it free</p>
+        <p class="search-title">Look up any Toronto restaurant</p>
+        <div class="search-input-wrapper">
+          <input type="text" class="search-input" id="restaurantSearch" placeholder="e.g., Pai Northern Thai Kitchen" autocomplete="off">
+          <div class="search-results" id="searchResults"></div>
+        </div>
+        <p class="search-hint">Search from 17,000+ inspected establishments</p>
+        
+        <div class="steps-inline desktop-only">
+          <div class="step-inline">
+            <span class="step-num-inline">01</span>
+            <span class="step-text-inline">Search your spots</span>
+          </div>
+          <div class="step-inline">
+            <span class="step-num-inline">02</span>
+            <span class="step-text-inline">See their record</span>
+          </div>
+          <div class="step-inline">
+            <span class="step-num-inline">03</span>
+            <span class="step-text-inline">Get alerts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="signup-card">
+      <div class="form-state" id="formState">
+        <!-- Countdown Timer -->
+        <div class="countdown-wrapper">
+          <div class="countdown-label">Launching January 1, 2026</div>
+          <div class="countdown-timer">
+            <div class="countdown-unit">
+              <div class="countdown-value" id="countdownDays">00</div>
+              <div class="countdown-unit-label">Days</div>
+            </div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-value" id="countdownHours">00</div>
+              <div class="countdown-unit-label">Hours</div>
+            </div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-value" id="countdownMinutes">00</div>
+              <div class="countdown-unit-label">Min</div>
+            </div>
+            <div class="countdown-separator">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-value" id="countdownSeconds">00</div>
+              <div class="countdown-unit-label">Sec</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="urgency-badge">
+          <span class="pulse"></span>
+          <span id="foundingSpotsLeft">847</span> founding spots left
+        </div>
+
+        <h2 class="display">Become a Founding Member</h2>
+        <p class="signup-desc">
+          <strong class="founding-value">6 months FREE</strong>, then just <strong class="founding-value">$3.99/mo</strong> locked for life.
+          <br><span class="live-counter"><span class="live-dot"></span> <strong class="counter-value" id="waitlistCount">247</strong> people ahead of you</span>
+        </p>
+
+        <div class="error-message" id="errorMessage"></div>
+        <input type="email" class="auth-input" id="emailInput" placeholder="Your email" required>
+        <button type="button" class="btn-primary" id="emailSubmit">Claim My Spot</button>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <button type="button" class="btn-google" id="googleSignIn">
+          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+
+        <p class="signup-fine">No spam. Unsubscribe anytime.</p>
+
+        <div class="divider"></div>
+
+        <div class="stats-row">
+          <div>
+            <div class="stat-value display"><span class="price-crossed">$5.99</span> <span class="founding-value">$3.99</span></div>
+            <div class="stat-label">per month for life</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="stat-value display">2 hrs</div>
+            <div class="stat-label">alert speed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-state" id="successState">
+        <div class="success-icon">
+          <div class="success-icon-inner"></div>
+        </div>
+        <h3 class="display">You're on the list!</h3>
+        <p id="successMessage">Check your email to confirm.</p>
+
+        <div class="referral-section" id="referralSection">
+          <div class="queue-position">
+            <span class="queue-label">Your position</span>
+            <span class="queue-number" id="queuePosition">#248</span>
+          </div>
+
+          <div class="referral-box">
+            <p class="referral-cta">Share to jump ahead. Each friend = <strong>+10 spots</strong></p>
+            <div class="referral-code-wrapper">
+              <input type="text" class="referral-code-input" id="referralCodeInput" readonly value="SUPPER-XXXX">
+              <button class="referral-copy-btn" id="copyReferralCode">Copy</button>
+            </div>
+            <div class="referral-share-btns">
+              <button class="share-btn twitter" id="referralTwitter">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </button>
+              <button class="share-btn whatsapp" id="referralWhatsapp">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </button>
+              <button class="share-btn copy" id="referralLink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              </button>
+            </div>
+            <p class="referral-stats"><span id="referralCount">0</span> friends joined · <span id="spotsJumped">0</span> spots jumped</p>
+          </div>
+          <a href="waitlist.html" class="waitlist-link">View full dashboard →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-secondary">
+      <div class="steps-inline" style="border-top: none; padding-top: 0; margin-top: 0;">
+        <div class="step-inline">
+          <span class="step-num-inline">01</span>
+          <span class="step-text-inline">Search your regular spots</span>
+        </div>
+        <div class="step-inline">
+          <span class="step-num-inline">02</span>
+          <span class="step-text-inline">See their inspection record</span>
+        </div>
+        <div class="step-inline">
+          <span class="step-num-inline">03</span>
+          <span class="step-text-inline">Get alerts when things change</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-container" id="modalContainer">
+    <!-- Report Card or Gate will be inserted here -->
+  </div>
+</div>
+
+<!-- REPORT CARD TEMPLATE (hidden) -->
+<template id="reportCardTemplate">
+  <div class="report-card">
+    <div class="report-status-bar" id="statusBar">
+      <span class="status-text" id="statusText">Pass</span>
+      <span class="status-date" id="statusDate">Inspected Jun 23, 2025</span>
+    </div>
+
+    <div class="report-content">
+      <div class="report-header">
+        <div class="report-name" id="reportName">Restaurant Name</div>
+        <div class="report-address" id="reportAddress">123 Street</div>
+      </div>
+
+      <!-- Loading State (shown first) -->
+      <div class="score-loading" id="scoreLoading">
+        <div class="score-loading-icon"></div>
+        <div class="score-loading-text">Analyzing inspection records...</div>
+      </div>
+
+      <!-- Safety Score Hero (revealed after loading) -->
+      <div class="safety-score-hero" id="safetyScoreHero" style="display: none;">
+        <div class="celebration-badge" id="celebrationBadge" style="display: none;">
+          Excellent Safety Record
+        </div>
+        <div class="warning-badge" id="warningBadge" style="display: none;">
+          Safety Concerns Found
+        </div>
+
+        <div class="score-circle-wrapper" id="scoreCircleWrapper">
+          <div class="score-circle-bg"></div>
+          <div class="score-circle-ring" id="scoreRing"></div>
+          <div class="score-circle-inner">
+            <div class="score-number-main" id="scoreNumber">0</div>
+            <div class="score-out-of">out of 100</div>
+          </div>
+        </div>
+
+        <div class="score-label" id="scoreLabel">Calculating...</div>
+        <div class="score-percentile" id="scorePercentile">Comparing to Toronto restaurants...</div>
+
+        <div class="severity-breakdown" id="severityBreakdown" style="margin-top: 16px;">
+          <div class="severity-pill"><span class="severity-dot crucial"></span><span id="crucialCount">0</span> crucial</div>
+          <div class="severity-pill"><span class="severity-dot significant"></span><span id="significantCount">0</span> significant</div>
+          <div class="severity-pill"><span class="severity-dot minor"></span><span id="minorCount">0</span> minor</div>
+        </div>
+      </div>
+
+      <div class="findings-section" id="findingsSection" style="display: none;">
+        <div class="findings-label">What inspectors found</div>
+        <div id="findingsList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="history-section" id="historySection" style="display: none;">
+        <div class="history-header">
+          <span class="history-label">Inspection History</span>
+          <span class="history-count" id="historyCount">6 visits since 2022</span>
+        </div>
+        <div class="trend-bars" id="trendBars"></div>
+        <div class="history-insight" id="historyInsight">
+          <strong>7x more infractions</strong> than their previous average.
+        </div>
+      </div>
+
+      <!-- Enhanced Share Section -->
+      <div class="share-section-enhanced" id="shareSection" style="display: none;">
+        <div class="share-header" id="shareHeader">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+          Share this report
+        </div>
+        <div class="share-subtext" id="shareSubtext">Let friends know about this restaurant</div>
+        <div class="share-buttons-row">
+          <button class="share-btn twitter" id="shareTwitter">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            Share
+          </button>
+          <button class="share-btn whatsapp" id="shareWhatsapp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Send
+          </button>
+          <button class="share-btn copy" id="shareCopy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <!-- Personalized CTA -->
+      <button class="report-cta" id="reportCta" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span id="ctaText">Get alerts for this restaurant</span>
+      </button>
+
+      <div class="report-footer" id="reportFooter" style="display: none;">
+        <div class="report-brand">
+          <div class="report-brand-mark"><div class="report-brand-mark-inner"></div></div>
+          <span class="report-brand-text">suppersafe.com</span>
+        </div>
+        <button class="report-close" id="reportClose">Search another</button>
+      </div>
+
+      <div class="data-source" id="dataSource" style="display: none;">Data from Toronto Public Health DineSafe</div>
+    </div>
+  </div>
+</template>
+
+<!-- GATE MODAL TEMPLATE -->
+<template id="gateTemplate">
+  <div class="gate-modal">
+    <div class="gate-emoji"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+    <h3 class="gate-title">Want to search more?</h3>
+    <p class="gate-subtitle">Join the waitlist for unlimited searches and real-time alerts when your restaurants get inspected.</p>
+    <div class="gate-form">
+      <input type="email" class="auth-input" id="gateEmail" placeholder="Your email">
+      <button type="button" class="btn-primary" id="gateSubmit">Get free access</button>
+    </div>
+    <p class="gate-fine"><span id="gateCount">247</span> people already on the list</p>
+    <button class="gate-skip" id="gateSkip">Maybe later</button>
+  </div>
+</template>
+
+<section class="features">
+  <div class="container">
+    <p class="features-label display">What you get</p>
+    <div class="features-grid">
+      <div class="feature">
+        <h3>Know before you book</h3>
+        <p>When Toronto Public Health files an inspection, you know within hours. Not weeks later.</p>
+      </div>
+      <div class="feature">
+        <h3>Plain English</h3>
+        <p>We translate inspector jargon into what actually happened. Real words, real context.</p>
+      </div>
+      <div class="feature">
+        <h3>Your restaurants only</h3>
+        <p>Save your regular spots. We only alert you about places you actually eat at.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="problem">
+  <div class="problem-inner">
+    <h2 class="display">The city knows. Why don't you?</h2>
+    <div class="problem-text">
+      <p>Toronto Public Health inspects restaurants constantly. They publish everything on DineSafe. It's all public.</p>
+      <p>But you'd have to check manually, search by name, scroll through dates, and decode what "M - Minor infraction: Operator fail to ensure necessary measures" means for your dinner plans.</p>
+      <p>Nobody does that. So that place with the pest problem? You found out the hard way.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="faq-inner">
+    <h2 class="display">Questions</h2>
+    
+    <div class="faq-item">
+      <h3>Where does the data come from?</h3>
+      <p>Toronto Public Health's DineSafe program. Same source as the signs in restaurant windows. We just make it accessible.</p>
+    </div>
+    
+    <div class="faq-item">
+      <h3>Why $5.99 a month?</h3>
+      <p>Monitoring data, processing it, and sending alerts costs money. $5.99 keeps us independent - no ads, no selling data. Founding members get it for $3.99/mo for life.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>When do you launch?</h3>
+      <p>January 1, 2026 in Toronto. First 1,000 founding members get 6 months free + $3.99/mo locked forever.</p>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2 class="display">Stop eating in the dark</h2>
+    <p>First 1,000 founding members get <strong class="founding-value">6 months FREE</strong> + <strong class="founding-value">$3.99/mo for life</strong>.<br><span id="waitlistCountBottom">247</span> spots already claimed.</p>
+
+    <div class="final-cta-form" id="finalForm">
+      <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
+      <button type="button" class="btn-primary" id="finalSubmit">Claim My Spot</button>
+    </div>
+
+    <p class="final-success" id="finalSuccess">You're in! Check your email to confirm.</p>
+  </div>
+</section>
+
+<div class="sticky-cta" id="stickyCta">
+  <div class="sticky-cta-inner">
+    <input type="email" class="auth-input" id="stickyEmailInput" placeholder="Your email">
+    <button type="button" class="btn-primary" id="stickySubmit">Claim Spot</button>
+  </div>
+  <p class="sticky-cta-count"><span id="stickyCount">249</span> ahead of you · <strong class="founding-value">6 months FREE</strong></p>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="logo-mark"><div class="logo-mark-inner"></div></div>
+      <span class="logo-text">suppersafe</span>
+    </div>
+    <div class="footer-right">Toronto, 2026</div>
+  </div>
+</footer>
+
+<script>
+  const SUPABASE_URL = 'https://txxkimndpqprbqhlknrk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4eGtpbW5kcHFwcmJxaGxrbnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTE1ODgsImV4cCI6MjA3OTc2NzU4OH0.4Zm1ShwG-_kc_E0tkltEBnNzfWdVeb7gRDh6b3-pCb8';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // State
+  let searchCount = 0;
+  let isUnlocked = false;
+  let currentRestaurant = null;
+  let hasSignedUp = false;
+
+  // Elements
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalContainer = document.getElementById('modalContainer');
+  const searchInput = document.getElementById('restaurantSearch');
+  const searchResults = document.getElementById('searchResults');
+  const toast = document.getElementById('toast');
+
+  // Check if already unlocked (localStorage)
+  if (localStorage.getItem('suppersafe_unlocked') === 'true') {
+    isUnlocked = true;
+  }
+
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2500);
+  }
+
+  function openModal() {
+    modalOverlay.classList.add('active');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('active');
+    document.body.classList.remove('modal-open');
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // =============================================================================
+  // LUCIDE SVG ICONS - Minimal, professional icon system
+  // =============================================================================
+
+  const icons = {
+    // UI Icons
+    search: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+    share: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>',
+
+    // Alert/Warning Icons
+    alertCircle: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+    alertTriangle: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>',
+    shieldAlert: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>',
+
+    // Pest/Bug Icons
+    bug: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>',
+
+    // Temperature Icons
+    thermometer: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>',
+    snowflake: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>',
+    flame: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+
+    // Water/Cleaning Icons
+    droplet: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>',
+    droplets: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>',
+    sparkles: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>',
+
+    // Document/Clipboard Icons
+    clipboard: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>',
+    fileText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+    scroll: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>',
+    tag: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>',
+
+    // Utility Icons
+    lightbulb: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
+    hand: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>',
+    home: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    utensils: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+    paintbrush: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.622 17.897-10.68-2.913"/><path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/><path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15"/></svg>',
+    square: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>'
+  };
+
+  // Helper to get icon SVG string
+  function getIcon(name, size = 16) {
+    const svg = icons[name] || icons.fileText;
+    return svg.replace(/width="24"/g, `width="${size}"`).replace(/height="24"/g, `height="${size}"`);
+  }
+
+  // =============================================================================
+
+  // Plain English translations for infractions (using SVG icons)
+  function translateInfraction(text) {
+    const t = text.toLowerCase();
+    if (t.includes('handwash') && t.includes('soap')) return { icon: getIcon('droplet'), text: 'No soap at handwashing station' };
+    if (t.includes('handwash') && t.includes('paper')) return { icon: getIcon('scroll'), text: 'No paper towels at handwashing station' };
+    if (t.includes('handwash')) return { icon: getIcon('hand'), text: 'Handwashing station issue' };
+    if (t.includes('pest') || t.includes('vermin')) return { icon: getIcon('bug'), text: 'Gaps allowing pest entry' };
+    if (t.includes('rodent')) return { icon: getIcon('bug'), text: 'Evidence of rodents' };
+    if (t.includes('temperature') && t.includes('cold')) return { icon: getIcon('snowflake'), text: 'Food not kept cold enough' };
+    if (t.includes('temperature') && t.includes('hot')) return { icon: getIcon('flame'), text: 'Food not kept hot enough' };
+    if (t.includes('thermometer')) return { icon: getIcon('thermometer'), text: 'Missing thermometer in fridge/freezer' };
+    if (t.includes('sanitiz') || t.includes('sanitis')) return { icon: getIcon('sparkles'), text: 'Equipment not properly sanitized' };
+    if (t.includes('clean') && t.includes('floor')) return { icon: getIcon('paintbrush'), text: 'Floors not clean' };
+    if (t.includes('clean') && t.includes('wall')) return { icon: getIcon('square'), text: 'Walls not clean' };
+    if (t.includes('food handler') || t.includes('certification')) return { icon: getIcon('clipboard'), text: 'Staff certification issue' };
+    if (t.includes('utensil') && t.includes('clean')) return { icon: getIcon('utensils'), text: 'Utensils not cleanable' };
+    if (t.includes('chemical') && t.includes('rinse')) return { icon: getIcon('droplets'), text: 'Dishwasher not sanitizing properly' };
+    if (t.includes('contamination')) return { icon: getIcon('alertTriangle'), text: 'Food contamination risk' };
+    if (t.includes('sanitary condition')) return { icon: getIcon('home'), text: 'Food area not sanitary' };
+    return { icon: getIcon('fileText'), text: 'Health code violation' };
+  }
+
+  async function searchRestaurants(query) {
+    if (query.length < 2) {
+      searchResults.classList.remove('active');
+      return;
+    }
+
+    searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+    searchResults.classList.add('active');
+
+    try {
+      const { data, error } = await supabase
+        .from('dinesafe')
+        .select('establishment_id, establishment_name, establishment_address')
+        .ilike('establishment_name', `%${query}%`)
+        .order('establishment_name')
+        .limit(50);
+
+      if (error) throw error;
+
+      const unique = [];
+      const seen = new Set();
+      for (const item of data) {
+        if (!seen.has(item.establishment_id)) {
+          seen.add(item.establishment_id);
+          unique.push(item);
+        }
+      }
+
+      if (unique.length === 0) {
+        searchResults.innerHTML = '<div class="search-no-results">No restaurants found</div>';
+        return;
+      }
+
+      searchResults.innerHTML = unique.slice(0, 6).map(r => `
+        <div class="search-result-item" data-id="${r.establishment_id}" data-name="${escapeHtml(r.establishment_name)}" data-address="${escapeHtml(r.establishment_address || '')}">
+          <div class="search-result-name">${escapeHtml(r.establishment_name)}</div>
+          <div class="search-result-address">${escapeHtml(r.establishment_address || '')}</div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => selectRestaurant(item.dataset.id, item.dataset.name, item.dataset.address));
+      });
+    } catch (err) {
+      console.error(err);
+      searchResults.innerHTML = '<div class="search-no-results">Error searching. Try again.</div>';
+    }
+  }
+
+  async function selectRestaurant(id, name, address) {
+    searchResults.classList.remove('active');
+    searchInput.value = '';
+
+    // Check if gated
+    if (!isUnlocked && searchCount >= 1) {
+      showGateModal();
+      return;
+    }
+
+    searchCount++;
+    await showReportCard(id, name, address);
+  }
+
+  function showGateModal() {
+    const template = document.getElementById('gateTemplate');
+    const clone = template.content.cloneNode(true);
+    modalContainer.innerHTML = '';
+    modalContainer.appendChild(clone);
+
+    document.getElementById('gateCount').textContent = document.getElementById('waitlistCount').textContent;
+
+    document.getElementById('gateSubmit').addEventListener('click', async () => {
+      const email = document.getElementById('gateEmail').value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast('Please enter a valid email');
+        return;
+      }
+      document.getElementById('gateSubmit').disabled = true;
+      document.getElementById('gateSubmit').textContent = 'Joining...';
+      await signUpWithEmail(email);
+      isUnlocked = true;
+      localStorage.setItem('suppersafe_unlocked', 'true');
+      closeModal();
+      showToast('You\'re in! Search away.');
+    });
+
+    document.getElementById('gateSkip').addEventListener('click', () => {
+      closeModal();
+    });
+
+    openModal();
+  }
+
+  // ===========================================
+  // SAFETY SCORE CALCULATION & REVEAL SYSTEM
+  // ===========================================
+
+  // Calculate safety score (0-100)
+  function calculateSafetyScore(crucial, significant, minor, status) {
+    // Start at 100, deduct points for violations
+    let score = 100;
+    score -= crucial * 25;      // Crucial: -25 points each
+    score -= significant * 10;  // Significant: -10 points each
+    score -= minor * 3;         // Minor: -3 points each
+
+    // Status penalty
+    if (status === 'Conditional Pass') score -= 10;
+    if (status === 'Closed') score -= 30;
+
+    return Math.max(0, Math.min(100, score));
+  }
+
+  // Get score color and label
+  function getScoreDetails(score) {
+    if (score >= 90) return { color: '#059669', label: 'Excellent', class: 'excellent', hex: '#10B981' };
+    if (score >= 80) return { color: '#10B981', label: 'Good', class: 'good', hex: '#34D399' };
+    if (score >= 70) return { color: '#D97706', label: 'Fair', class: 'fair', hex: '#FBBF24' };
+    if (score >= 60) return { color: '#F97316', label: 'Needs Work', class: 'poor', hex: '#F97316' };
+    return { color: '#DC2626', label: 'Critical', class: 'critical', hex: '#EF4444' };
+  }
+
+  // Calculate percentile (simulated based on score distribution)
+  function calculatePercentile(score) {
+    // Simulated percentile based on typical Toronto restaurant distribution
+    // Most restaurants score 70-90, so we skew accordingly
+    if (score >= 95) return Math.floor(Math.random() * 5) + 95;  // 95-99%
+    if (score >= 90) return Math.floor(Math.random() * 10) + 85; // 85-94%
+    if (score >= 85) return Math.floor(Math.random() * 10) + 70; // 70-79%
+    if (score >= 80) return Math.floor(Math.random() * 15) + 55; // 55-69%
+    if (score >= 70) return Math.floor(Math.random() * 15) + 35; // 35-49%
+    if (score >= 60) return Math.floor(Math.random() * 15) + 20; // 20-34%
+    return Math.floor(Math.random() * 15) + 5;                   // 5-19%
+  }
+
+  // =============================================================================
+  // SHARE MESSAGE TEMPLATES - Viral-optimized, varied copy
+  // =============================================================================
+
+  const shareTemplates = {
+    twitter: {
+      // Excellent (90-100) - celebration
+      excellent: [
+        { weight: 3, template: (r) => `${r.name} scored ${r.score}/100 on their health inspection. Cleaner than ${r.percentile}% of Toronto restaurants.\n\nFinally a spot I can recommend without caveats: suppersafe.com` },
+        { weight: 2, template: (r) => `Good news: ${r.name} is spotless. ${r.score}/100 on safety, zero concerns.\n\nLook up any Toronto restaurant: suppersafe.com` },
+        { weight: 1, template: (r) => `Shoutout to ${r.name} for having a clean health record. ${r.score}/100.\n\nCheck any restaurant here: suppersafe.com` }
+      ],
+      // Good (80-89)
+      good: [
+        { weight: 2, template: (r) => `${r.name} passes the food safety check - ${r.score}/100. Solid choice.\n\nLook up any Toronto restaurant: suppersafe.com` },
+        { weight: 1, template: (r) => `Checked ${r.name} - ${r.score}/100 on safety. Nothing to worry about.\n\nsuppersafe.com` }
+      ],
+      // Fair (70-79)
+      fair: [
+        { weight: 2, template: (r) => `Heads up: ${r.name} is ${r.score}/100 on food safety. ${r.total} violation${r.total !== 1 ? 's' : ''} on their last inspection.\n\nLook yours up: suppersafe.com` },
+        { weight: 1, template: (r) => `${r.name} had ${r.total} issue${r.total !== 1 ? 's' : ''} on their last inspection. Not terrible, but worth knowing.\n\nsuppersafe.com` }
+      ],
+      // Poor (60-69)
+      poor: [
+        { weight: 2, template: (r) => `PSA: you can look up any Toronto restaurant's health inspection for free.\n\n${r.name}? ${r.score}/100 with ${r.total} violations.\n\nsuppersafe.com` },
+        { weight: 1, template: (r) => `That place you're going to might have health violations on file.\n\n${r.name}: ${r.score}/100, ${r.total} issues.\n\nsuppersafe.com` }
+      ],
+      // Critical (<60)
+      critical: [
+        { weight: 3, template: (r) => `Safety Alert: ${r.name} scored just ${r.score}/100 on their health inspection${r.crucial > 0 ? ` with ${r.crucial} critical violation${r.crucial !== 1 ? 's' : ''}` : ''}.\n\nCheck before you eat: suppersafe.com` },
+        { weight: 2, template: (r) => `Just looked up ${r.name} before booking. ${r.score}/100 on safety. ${r.total} violations.${r.topFinding ? `\n\nIncluding "${r.topFinding}."` : ''}\n\nsuppersafe.com` },
+        { weight: 2, template: (r) => `Friendly reminder that restaurant health inspections are public record.\n\n${r.name}: ${r.score}/100, ${r.total} violations.\n\nsuppersafe.com` }
+      ],
+      // Pest-specific (overrides score tier when detected)
+      pests: [
+        { weight: 4, template: (r) => `Looked up ${r.name} and... they found pest evidence on the last inspection.\n\nYou can check any Toronto restaurant: suppersafe.com` },
+        { weight: 2, template: (r) => `Maybe don't read this if you've eaten at ${r.name} recently.\n\nPest evidence on their last health inspection.\n\nsuppersafe.com` }
+      ],
+      // Conditional pass status
+      conditionalPass: [
+        { weight: 3, template: (r) => `${r.name} is on "Conditional Pass" status with Toronto Public Health. ${r.score}/100.\n\nYou can look up any restaurant: suppersafe.com` },
+        { weight: 2, template: (r) => `TIL ${r.name} has a conditional pass from health inspectors. Might want to check your regular spots too.\n\nsuppersafe.com` }
+      ]
+    },
+
+    whatsapp: {
+      excellent: [
+        { weight: 3, template: (r) => `actually good news: ${r.name} is clean\n\n${r.score}/100 on safety, cleaner than ${r.percentile}% of toronto restaurants\n\nyou can look up any spot here: suppersafe.com` },
+        { weight: 2, template: (r) => `${r.name} - ${r.score}/100 on health inspection (clean)\n\nfinally a place I can recommend without caveats lol\n\nsuppersafe.com` }
+      ],
+      good: [
+        { weight: 2, template: (r) => `looked up ${r.name}\n\n${r.score}/100 on their health inspection, nothing to worry about\n\nyou can check any restaurant: suppersafe.com` }
+      ],
+      fair: [
+        { weight: 2, template: (r) => `looked up ${r.name}\n\n${r.score}/100, ${r.total} minor thing${r.total !== 1 ? 's' : ''} on their last inspection\n\nyou can check any restaurant: suppersafe.com` }
+      ],
+      poor: [
+        { weight: 2, template: (r) => `before you book that dinner reservation\n\nyou can look up any restaurant's health inspection record\n\n${r.name} is ${r.score}/100 with ${r.total} violations\n\nsuppersafe.com` },
+        { weight: 1, template: (r) => `not to be that person but\n\n${r.name} is ${r.score}/100 on health inspection\n\nyou can look up any toronto restaurant here: suppersafe.com` }
+      ],
+      critical: [
+        { weight: 3, template: (r) => `ok so you know those green/yellow/red signs in restaurant windows?\n\nyou can look up the actual reports online\n\njust checked ${r.name}... ${r.score}/100${r.topFinding ? `\n\nincluding ${r.topFinding.toLowerCase()}` : ''}\n\nsuppersafe.com` },
+        { weight: 2, template: (r) => `heads up about ${r.name} - they only scored ${r.score}/100 on food safety${r.crucial > 0 ? ` (${r.crucial} critical issue${r.crucial !== 1 ? 's' : ''})` : ''}\n\nmight want to pick somewhere else\n\nsuppersafe.com` }
+      ],
+      pests: [
+        { weight: 4, template: (r) => `uhhhh so I looked up ${r.name}\n\nthey found pest evidence on the last health inspection\n\njust thought you should know\n\nsuppersafe.com` },
+        { weight: 2, template: (r) => `ok don't shoot the messenger but\n\n${r.name} had pest issues on their last inspection\n\nyou can look up any restaurant here: suppersafe.com` }
+      ],
+      conditionalPass: [
+        { weight: 3, template: (r) => `heads up - ${r.name} is on conditional pass with health inspectors\n\n${r.score}/100\n\nyou can look up any restaurant: suppersafe.com` }
+      ]
+    },
+
+    copy: {
+      default: [
+        { weight: 2, template: (r) => `${r.name}\nSafety Score: ${r.score}/100 (${r.label})\n${r.score >= 80 ? `Cleaner than ${r.percentile}%` : `Worse than ${100 - r.percentile}%`} of Toronto restaurants\n\n${r.status} - Inspected ${r.dateFormatted}\nViolations: ${r.crucial} crucial, ${r.significant} significant, ${r.minor} minor\n\nLook up any restaurant: suppersafe.com` },
+        { weight: 1, template: (r) => `Health inspection results for ${r.name}:\n\n${r.score}/100 - ${r.label}\n${r.total} violation${r.total !== 1 ? 's' : ''} on last inspection${r.topFinding ? `\nIncluding: ${r.topFinding}` : ''}\n\nCheck any restaurant: suppersafe.com` }
+      ]
+    }
+  };
+
+  // Select template using weighted random
+  function selectWeightedTemplate(templates) {
+    if (!templates || templates.length === 0) return null;
+    const totalWeight = templates.reduce((sum, t) => sum + (t.weight || 1), 0);
+    let random = Math.random() * totalWeight;
+    for (const t of templates) {
+      random -= (t.weight || 1);
+      if (random <= 0) return t.template;
+    }
+    return templates[0].template;
+  }
+
+  // Get the most "shareable" finding (shocking details)
+  function getTopShareFinding(findings) {
+    if (!findings || findings.length === 0) return null;
+    const shockWords = ['pest', 'rodent', 'vermin', 'contamination', 'sewage', 'mold', 'feces', 'insect', 'cockroach'];
+    const secondaryWords = ['temperature', 'handwash', 'sanitiz', 'raw meat'];
+
+    for (const f of findings) {
+      const lower = f.text ? f.text.toLowerCase() : f.toLowerCase();
+      if (shockWords.some(w => lower.includes(w))) {
+        // Return simplified version
+        if (lower.includes('pest') || lower.includes('vermin')) return 'pest evidence';
+        if (lower.includes('rodent')) return 'rodent evidence';
+        if (lower.includes('cockroach')) return 'cockroaches found';
+        return 'contamination issues';
+      }
+    }
+    for (const f of findings) {
+      const lower = f.text ? f.text.toLowerCase() : f.toLowerCase();
+      if (secondaryWords.some(w => lower.includes(w))) {
+        if (lower.includes('temperature')) return 'food temperature issues';
+        if (lower.includes('handwash')) return 'handwashing issues';
+        return 'sanitization issues';
+      }
+    }
+    return null;
+  }
+
+  // Check for pest-related violations
+  function hasPestViolations(findings) {
+    if (!findings) return false;
+    const pestWords = ['pest', 'rodent', 'vermin', 'cockroach', 'mouse', 'rat', 'insect'];
+    return findings.some(f => {
+      const text = f.text ? f.text.toLowerCase() : f.toLowerCase();
+      return pestWords.some(w => text.includes(w));
+    });
+  }
+
+  // Get share message for a restaurant
+  function getShareMessage(platform, restaurant) {
+    const { name, safetyScore, percentile, crucial, significant, minor, status, latestDate, findings } = restaurant;
+    const total = (crucial || 0) + (significant || 0) + (minor || 0);
+    const dateFormatted = latestDate ? new Date(latestDate).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown';
+
+    const r = {
+      name,
+      score: safetyScore,
+      percentile,
+      crucial: crucial || 0,
+      significant: significant || 0,
+      minor: minor || 0,
+      total,
+      status: status || 'Unknown',
+      dateFormatted,
+      label: getScoreDetails(safetyScore).label,
+      topFinding: getTopShareFinding(findings)
+    };
+
+    // Determine category
+    let category;
+    if (platform === 'copy') {
+      category = 'default';
+    } else if (hasPestViolations(findings)) {
+      category = 'pests';
+    } else if (status === 'Conditional Pass') {
+      category = 'conditionalPass';
+    } else if (safetyScore >= 90) {
+      category = 'excellent';
+    } else if (safetyScore >= 80) {
+      category = 'good';
+    } else if (safetyScore >= 70) {
+      category = 'fair';
+    } else if (safetyScore >= 60) {
+      category = 'poor';
+    } else {
+      category = 'critical';
+    }
+
+    const templates = shareTemplates[platform]?.[category] || shareTemplates[platform]?.fair;
+    if (!templates) {
+      return `${r.name} - ${r.score}/100 on health inspection. Check any Toronto restaurant: suppersafe.com`;
+    }
+
+    const templateFn = selectWeightedTemplate(templates);
+    return templateFn(r);
+  }
+
+  // =============================================================================
+
+  // Animated count-up
+  function animateCountUp(element, targetValue, duration, onComplete) {
+    const startTime = performance.now();
+    const startValue = 0;
+
+    function update(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Ease-out cubic for satisfying deceleration
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentValue = Math.round(startValue + (targetValue - startValue) * easeOut);
+
+      element.textContent = currentValue;
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        element.textContent = targetValue;
+        if (onComplete) onComplete();
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  // Haptic feedback (if supported)
+  function triggerHaptic(pattern) {
+    if (navigator.vibrate) {
+      navigator.vibrate(pattern);
+    }
+  }
+
+  // Enhanced visceral translations
+  function translateInfractionVisceral(text, severity) {
+    const t = text.toLowerCase();
+    const sev = severity.toUpperCase();
+    const isCrucial = sev.startsWith('C');
+    const isSignificant = sev.startsWith('S');
+
+    // Crucial violations - maximum impact
+    if (isCrucial) {
+      if (t.includes('rodent') || t.includes('mouse') || t.includes('rat')) return { icon: getIcon('bug'), text: 'Rodent activity detected', severity: 'crucial' };
+      if (t.includes('cockroach') || t.includes('roach')) return { icon: getIcon('bug'), text: 'Cockroaches found on premises', severity: 'crucial' };
+      if (t.includes('pest') || t.includes('vermin')) return { icon: getIcon('bug'), text: 'Active pest infestation', severity: 'crucial' };
+      if (t.includes('sewage') || t.includes('sewerage')) return { icon: getIcon('droplets'), text: 'Sewage/drainage issue', severity: 'crucial' };
+      if (t.includes('temperature') && t.includes('danger')) return { icon: getIcon('thermometer'), text: 'Food held at dangerous temperatures', severity: 'crucial' };
+      if (t.includes('contamina')) return { icon: getIcon('shieldAlert'), text: 'Food contamination risk', severity: 'crucial' };
+      return { icon: getIcon('alertCircle'), text: 'Critical health violation', severity: 'crucial' };
+    }
+
+    // Significant violations
+    if (isSignificant) {
+      if (t.includes('handwash') && t.includes('soap')) return { icon: getIcon('droplet'), text: 'No soap at handwashing station', severity: 'significant' };
+      if (t.includes('handwash') && t.includes('paper')) return { icon: getIcon('scroll'), text: 'No paper towels for hand drying', severity: 'significant' };
+      if (t.includes('handwash')) return { icon: getIcon('hand'), text: 'Handwashing facility issue', severity: 'significant' };
+      if (t.includes('temperature') && t.includes('cold')) return { icon: getIcon('snowflake'), text: 'Cold food not kept cold enough', severity: 'significant' };
+      if (t.includes('temperature') && t.includes('hot')) return { icon: getIcon('flame'), text: 'Hot food not kept hot enough', severity: 'significant' };
+      if (t.includes('sanitiz') || t.includes('sanitis')) return { icon: getIcon('sparkles'), text: 'Equipment not properly sanitized', severity: 'significant' };
+      if (t.includes('cross-contam') || t.includes('cross contam')) return { icon: getIcon('alertTriangle'), text: 'Cross-contamination risk', severity: 'significant' };
+      return { icon: getIcon('alertTriangle'), text: 'Significant health violation', severity: 'significant' };
+    }
+
+    // Minor violations
+    if (t.includes('thermometer')) return { icon: getIcon('thermometer'), text: 'Missing thermometer in fridge/freezer', severity: 'minor' };
+    if (t.includes('clean') && t.includes('floor')) return { icon: getIcon('paintbrush'), text: 'Floors need cleaning', severity: 'minor' };
+    if (t.includes('clean') && t.includes('wall')) return { icon: getIcon('square'), text: 'Walls need cleaning', severity: 'minor' };
+    if (t.includes('food handler') || t.includes('certification')) return { icon: getIcon('clipboard'), text: 'Staff certification paperwork issue', severity: 'minor' };
+    if (t.includes('light') && t.includes('cover')) return { icon: getIcon('lightbulb'), text: 'Light fixture needs cover', severity: 'minor' };
+    if (t.includes('label')) return { icon: getIcon('tag'), text: 'Food labeling issue', severity: 'minor' };
+
+    return { icon: getIcon('fileText'), text: 'Health code violation', severity: 'minor' };
+  }
+
+  async function showReportCard(id, name, address) {
+    const template = document.getElementById('reportCardTemplate');
+    const clone = template.content.cloneNode(true);
+    modalContainer.innerHTML = '';
+    modalContainer.appendChild(clone);
+
+    // Set initial values
+    document.getElementById('reportName').textContent = name;
+    document.getElementById('reportAddress').textContent = address;
+    document.getElementById('statusText').textContent = 'Loading...';
+
+    openModal();
+
+    try {
+      const { data, error } = await supabase
+        .from('dinesafe')
+        .select('*')
+        .eq('establishment_id', id)
+        .order('inspection_date', { ascending: false });
+
+      if (error) throw error;
+
+      // Group by inspection_id
+      const inspectionMap = new Map();
+      data.forEach(record => {
+        const inspId = record.inspection_id;
+        if (!inspectionMap.has(inspId)) {
+          inspectionMap.set(inspId, {
+            id: inspId,
+            date: record.inspection_date,
+            status: record.establishment_status,
+            infractions: []
+          });
+        }
+        const severity = (record.severity || '').trim();
+        if (severity && !severity.toUpperCase().startsWith('N')) {
+          inspectionMap.get(inspId).infractions.push({
+            severity,
+            details: record.infraction_details || ''
+          });
+        }
+      });
+
+      const inspections = Array.from(inspectionMap.values())
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const latest = inspections[0];
+      const status = latest?.status || 'Unknown';
+
+      let crucial = 0, significant = 0, minor = 0;
+      const findings = [];
+
+      latest?.infractions.forEach(inf => {
+        const sev = inf.severity.toUpperCase();
+        if (sev.startsWith('C')) crucial++;
+        else if (sev.startsWith('S')) significant++;
+        else if (sev.startsWith('M')) minor++;
+        if (inf.details) findings.push({ text: inf.details, severity: inf.severity });
+      });
+
+      const total = crucial + significant + minor;
+
+      // Calculate safety score
+      const safetyScore = calculateSafetyScore(crucial, significant, minor, status);
+      const scoreDetails = getScoreDetails(safetyScore);
+      const percentile = calculatePercentile(safetyScore);
+
+      currentRestaurant = {
+        id, name, address, status, crucial, significant, minor, total,
+        latestDate: latest?.date, inspections, safetyScore, percentile
+      };
+
+      // Update status bar
+      const statusBar = document.getElementById('statusBar');
+      statusBar.className = 'report-status-bar ' + (status === 'Pass' ? 'pass' : status === 'Conditional Pass' ? 'conditional' : 'closed');
+      document.getElementById('statusText').textContent = status;
+      document.getElementById('statusDate').textContent = latest?.date
+        ? `Inspected ${new Date(latest.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}`
+        : '';
+
+      // Calculate reveal timing based on score (faster for good, slower for bad)
+      const revealDelay = safetyScore >= 90 ? 1200 : safetyScore >= 80 ? 1500 : safetyScore >= 70 ? 1800 : 2200;
+      const countUpDuration = safetyScore >= 90 ? 800 : safetyScore >= 80 ? 1000 : safetyScore >= 70 ? 1200 : 1500;
+
+      // PHASE 1: Loading/Suspense (already visible)
+      await new Promise(resolve => setTimeout(resolve, revealDelay));
+
+      // PHASE 2: Hide loading, show score hero
+      document.getElementById('scoreLoading').style.display = 'none';
+      const scoreHero = document.getElementById('safetyScoreHero');
+      scoreHero.style.display = 'block';
+      scoreHero.classList.add('revealing');
+
+      // Set CSS custom properties for colors
+      scoreHero.style.setProperty('--score-color', scoreDetails.color);
+      scoreHero.style.setProperty('--score-percent', safetyScore);
+
+      // Get score circle wrapper for tier animations
+      const scoreCircleWrapper = document.getElementById('scoreCircleWrapper');
+
+      // TIERED CELEBRATION SYSTEM
+      // Tier 1: Excellent (90-100) - Confetti + celebration badge
+      if (safetyScore >= 90) {
+        scoreHero.classList.add('celebration');
+        document.getElementById('celebrationBadge').style.display = 'inline-flex';
+        setTimeout(() => document.getElementById('celebrationBadge').classList.add('revealed'), 100);
+      }
+      // Tier 2: Good (80-89) - Green glow pulse
+      else if (safetyScore >= 80) {
+        setTimeout(() => {
+          scoreCircleWrapper.classList.add('glow-green');
+        }, 300);
+      }
+      // Tier 3: Fair (70-79) - Yellow pulse
+      else if (safetyScore >= 70) {
+        setTimeout(() => scoreCircleWrapper.classList.add('glow-yellow'), 300);
+      }
+      // Tier 4: Needs Work (60-69) - Orange pulse
+      else if (safetyScore >= 60) {
+        setTimeout(() => scoreCircleWrapper.classList.add('glow-orange'), 300);
+      }
+      // Tier 5: Critical (<60) - Slow red fade + share highlight
+      else {
+        scoreHero.classList.add('critical-fade');
+        document.getElementById('warningBadge').style.display = 'inline-flex';
+        setTimeout(() => document.getElementById('warningBadge').classList.add('revealed'), 100);
+      }
+
+      // Animate the score ring
+      const scoreRing = document.getElementById('scoreRing');
+      scoreRing.style.setProperty('--score-color', scoreDetails.hex);
+
+      // PHASE 3: Animated count-up (or instant reveal for reduced motion)
+      const scoreNumber = document.getElementById('scoreNumber');
+      scoreNumber.style.setProperty('--score-color', scoreDetails.color);
+      scoreNumber.classList.add('revealed');
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Haptic feedback callback (runs after score reveal)
+      const hapticCallback = () => {
+        if (safetyScore >= 90) {
+          triggerHaptic([50, 100, 50]); // Double tap celebration
+        } else if (safetyScore >= 80) {
+          triggerHaptic([50]); // Single light tap
+        } else if (safetyScore >= 70) {
+          // No haptic for fair scores
+        } else if (safetyScore >= 60) {
+          // No haptic for needs work
+        } else {
+          triggerHaptic([150]); // Single firm vibration for critical
+        }
+      };
+
+      if (prefersReducedMotion) {
+        // Instant reveal for users who prefer reduced motion
+        scoreNumber.textContent = safetyScore;
+        hapticCallback();
+      } else {
+        // Animated count-up for standard experience
+        animateCountUp(scoreNumber, safetyScore, countUpDuration, hapticCallback);
+      }
+
+      // PHASE 4: Reveal label
+      setTimeout(() => {
+        const scoreLabel = document.getElementById('scoreLabel');
+        scoreLabel.textContent = scoreDetails.label;
+        scoreLabel.className = `score-label ${scoreDetails.class} revealed`;
+      }, 200);
+
+      // PHASE 5: Reveal percentile
+      setTimeout(() => {
+        const scorePercentile = document.getElementById('scorePercentile');
+        if (safetyScore >= 80) {
+          scorePercentile.innerHTML = `<strong>Cleaner than ${percentile}%</strong> of Toronto restaurants`;
+        } else {
+          scorePercentile.innerHTML = `<strong>Worse than ${100 - percentile}%</strong> of Toronto restaurants`;
+        }
+        scorePercentile.classList.add('revealed');
+      }, 350);
+
+      // Update severity breakdown
+      document.getElementById('crucialCount').textContent = crucial;
+      document.getElementById('significantCount').textContent = significant;
+      document.getElementById('minorCount').textContent = minor;
+
+      // PHASE 6: Show findings (if any)
+      setTimeout(() => {
+        const findingsList = document.getElementById('findingsList');
+        const findingsSection = document.getElementById('findingsSection');
+
+        if (findings.length > 0) {
+          const translated = findings.slice(0, 3).map(f => translateInfractionVisceral(f.text, f.severity));
+          findingsList.innerHTML = translated.map(t => `
+            <div class="finding-item ${t.severity}">
+              <span class="finding-icon">${t.icon}</span>
+              <span class="finding-text">${t.text}</span>
+              ${t.severity !== 'minor' ? `<span class="finding-severity-tag ${t.severity}">${t.severity}</span>` : ''}
+            </div>
+          `).join('');
+          if (findings.length > 3) {
+            findingsList.innerHTML += `<div class="finding-more">+ ${findings.length - 3} more issues</div>`;
+          }
+          findingsSection.style.display = 'block';
+        }
+      }, 600);
+
+      // PHASE 7: Show history
+      setTimeout(() => {
+        const historySection = document.getElementById('historySection');
+        historySection.style.display = 'block';
+
+        const oldestYear = inspections.length > 0 ? new Date(inspections[inspections.length - 1].date).getFullYear() : new Date().getFullYear();
+        document.getElementById('historyCount').textContent = `${inspections.length} visit${inspections.length === 1 ? '' : 's'} since ${oldestYear}`;
+
+        const trendBars = document.getElementById('trendBars');
+        const recent = inspections.slice(0, 6).reverse();
+        trendBars.innerHTML = recent.map(insp => {
+          const count = insp.infractions.length;
+          const height = Math.max(4, Math.min(32, count * 6 + 4));
+          const color = count === 0 ? 'clean' : count <= 2 ? 'warning' : 'danger';
+          return `<div class="trend-bar ${color}" style="height:${height}px"></div>`;
+        }).join('');
+
+        // Insight
+        const historyInsight = document.getElementById('historyInsight');
+        if (inspections.length >= 2) {
+          const prev = inspections.slice(1);
+          const prevAvg = prev.reduce((s, i) => s + i.infractions.length, 0) / prev.length;
+
+          if (total === 0) {
+            historyInsight.className = 'history-insight positive';
+            historyInsight.innerHTML = `<strong>Clean inspection!</strong> No issues found this visit.`;
+          } else if (total > prevAvg * 2 && prevAvg > 0) {
+            const mult = Math.round(total / prevAvg);
+            historyInsight.className = 'history-insight';
+            historyInsight.innerHTML = `<strong>${mult}x more infractions</strong> than their usual ${prevAvg.toFixed(1)} per visit. Something changed.`;
+          } else if (total <= 1 && prevAvg <= 1) {
+            historyInsight.className = 'history-insight positive';
+            historyInsight.innerHTML = `<strong>Consistently clean.</strong> This is their typical track record.`;
+          } else {
+            historyInsight.className = 'history-insight neutral';
+            historyInsight.innerHTML = `<strong>About average</strong> for this restaurant (${prevAvg.toFixed(1)} per visit).`;
+          }
+        } else {
+          historyInsight.className = 'history-insight neutral';
+          historyInsight.innerHTML = `<strong>First inspection</strong> on record.`;
+        }
+      }, 800);
+
+      // PHASE 8: Show share section with enhanced copy
+      setTimeout(() => {
+        const shareSection = document.getElementById('shareSection');
+        const shareHeader = document.getElementById('shareHeader');
+        const shareSubtext = document.getElementById('shareSubtext');
+
+        if (safetyScore >= 80) {
+          shareHeader.innerHTML = getIcon('sparkles', 16) + ' Share the good news';
+          shareSubtext.textContent = 'Let friends know about this clean spot';
+        } else if (safetyScore < 60) {
+          shareHeader.innerHTML = getIcon('alertTriangle', 16) + ' Warn your friends';
+          shareSubtext.textContent = 'They should know about this before eating here';
+          // Highlight share section for critical scores (call to action)
+          setTimeout(() => shareSection.classList.add('highlight-warning'), 200);
+        } else {
+          shareHeader.innerHTML = getIcon('share', 16) + ' Share this report';
+          shareSubtext.textContent = 'Let friends know what you found';
+        }
+
+        shareSection.style.display = 'block';
+      }, 1000);
+
+      // PHASE 9: Show personalized CTA
+      setTimeout(() => {
+        const reportCta = document.getElementById('reportCta');
+        const ctaText = document.getElementById('ctaText');
+
+        // Truncate name if too long
+        const shortName = name.length > 25 ? name.substring(0, 22) + '...' : name;
+        ctaText.textContent = `Alert me about ${shortName}`;
+
+        reportCta.style.display = 'flex';
+      }, 1100);
+
+      // PHASE 10: Show footer
+      setTimeout(() => {
+        document.getElementById('reportFooter').style.display = 'flex';
+        document.getElementById('dataSource').style.display = 'block';
+      }, 1200);
+
+      // Event listeners
+      document.getElementById('reportClose').addEventListener('click', () => {
+        closeModal();
+        searchInput.focus();
+      });
+
+      document.getElementById('reportCta').addEventListener('click', () => {
+        closeModal();
+        document.getElementById('emailInput').focus();
+        document.querySelector('.signup-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+
+      // Share handlers - using viral-optimized varied templates
+      document.getElementById('shareTwitter').addEventListener('click', () => {
+        if (!currentRestaurant) return;
+        const text = getShareMessage('twitter', currentRestaurant);
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+      });
+
+      document.getElementById('shareWhatsapp').addEventListener('click', () => {
+        if (!currentRestaurant) return;
+        const text = getShareMessage('whatsapp', currentRestaurant);
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+      });
+
+      document.getElementById('shareCopy').addEventListener('click', async () => {
+        if (!currentRestaurant) return;
+        const text = getShareMessage('copy', currentRestaurant);
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById('shareCopy');
+        btn.classList.add('copied');
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied';
+        showToast('Copied!');
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy';
+        }, 2000);
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById('scoreLoading').innerHTML = '<div style="color: #DC2626;">Error loading data. Please try again.</div>';
+    }
+  }
+
+  // Close modal on overlay click
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+
+  // Search
+  const debouncedSearch = debounce(searchRestaurants, 300);
+  searchInput.addEventListener('input', (e) => debouncedSearch(e.target.value.trim()));
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-input-wrapper')) {
+      searchResults.classList.remove('active');
+    }
+  });
+
+  // Auth
+  async function signUpWithEmail(email) {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin }
+      });
+      if (error) throw error;
+      showSuccess('Check your email to confirm.');
+      hasSignedUp = true;
+    } catch (error) {
+      showError(error.message || 'Something went wrong.');
+    }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMessage');
+    el.textContent = msg;
+    el.classList.add('active');
+  }
+
+  function showSuccess(msg) {
+    document.getElementById('successMessage').textContent = msg;
+    document.getElementById('formState').classList.add('hidden');
+    document.getElementById('successState').classList.add('active');
+    document.getElementById('finalForm').classList.add('hidden');
+    document.getElementById('finalSuccess').classList.add('active');
+    stickyCta.classList.add('hidden-complete');
+    isUnlocked = true;
+    localStorage.setItem('suppersafe_unlocked', 'true');
+  }
+
+  document.getElementById('emailSubmit').addEventListener('click', () => {
+    const email = document.getElementById('emailInput').value.trim();
+    if (!email) { showError('Enter your email'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Invalid email'); return; }
+    document.getElementById('emailSubmit').disabled = true;
+    document.getElementById('emailSubmit').textContent = 'Joining...';
+    signUpWithEmail(email);
+  });
+
+  document.getElementById('finalSubmit').addEventListener('click', () => {
+    const email = document.getElementById('finalEmailInput').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    document.getElementById('finalSubmit').disabled = true;
+    document.getElementById('finalSubmit').textContent = 'Joining...';
+    signUpWithEmail(email);
+  });
+
+  document.getElementById('googleSignIn').addEventListener('click', async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+    if (error) showError(error.message);
+  });
+
+  // Check auth
+  (async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      showSuccess('You\'re on the list!');
+    }
+  })();
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) showSuccess('You\'re on the list!');
+  });
+
+  // Waitlist count
+  (async () => {
+    try {
+      const { data } = await supabase.rpc('get_user_count');
+      if (data !== null) {
+        const count = data + 247;
+        ['waitlistCount', 'waitlistCountBottom', 'stickyCount'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = count;
+        });
+      }
+    } catch (e) {}
+  })();
+
+  // Sticky CTA
+  const stickyCta = document.getElementById('stickyCta');
+  const signupCard = document.querySelector('.signup-card');
+
+  function handleScroll() {
+    if (hasSignedUp) return;
+    const rect = signupCard.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 50 && rect.bottom > 100) {
+      stickyCta.classList.remove('visible');
+    } else {
+      stickyCta.classList.add('visible');
+    }
+  }
+
+  setTimeout(() => { if (window.innerWidth <= 1000) handleScroll(); }, 300);
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  document.getElementById('stickySubmit').addEventListener('click', () => {
+    const email = document.getElementById('stickyEmailInput').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    document.getElementById('stickySubmit').disabled = true;
+    document.getElementById('stickySubmit').textContent = '...';
+    signUpWithEmail(email);
+  });
+
+  // Enter key
+  ['emailInput', 'finalEmailInput', 'stickyEmailInput'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        const btnId = id === 'emailInput' ? 'emailSubmit' : id === 'finalEmailInput' ? 'finalSubmit' : 'stickySubmit';
+        document.getElementById(btnId).click();
+      }
+    });
+  });
+
+  // ===========================================
+  // COUNTDOWN TIMER TO JANUARY 1, 2026
+  // ===========================================
+  const launchDate = new Date('2026-01-01T00:00:00-05:00'); // EST timezone
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = launchDate - now;
+
+    if (diff <= 0) {
+      document.getElementById('countdownDays').textContent = '00';
+      document.getElementById('countdownHours').textContent = '00';
+      document.getElementById('countdownMinutes').textContent = '00';
+      document.getElementById('countdownSeconds').textContent = '00';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('countdownDays').textContent = days.toString().padStart(2, '0');
+    document.getElementById('countdownHours').textContent = hours.toString().padStart(2, '0');
+    document.getElementById('countdownMinutes').textContent = minutes.toString().padStart(2, '0');
+    document.getElementById('countdownSeconds').textContent = seconds.toString().padStart(2, '0');
+  }
+
+  // Initial update and start interval
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ===========================================
+  // LIVE SIGNUP COUNTER ANIMATION
+  // ===========================================
+  let baseCount = 247;
+  let displayCount = baseCount;
+
+  function simulateSignup() {
+    // Random increment between 5-20 seconds
+    const nextIncrement = Math.floor(Math.random() * 15000) + 5000;
+
+    setTimeout(() => {
+      displayCount++;
+
+      // Update all counter displays with animation
+      const counterEl = document.getElementById('waitlistCount');
+      if (counterEl) {
+        counterEl.textContent = displayCount;
+        counterEl.classList.add('bump');
+        setTimeout(() => counterEl.classList.remove('bump'), 300);
+      }
+
+      // Update other counters
+      ['waitlistCountBottom', 'stickyCount'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = displayCount;
+      });
+
+      // Decrease founding spots
+      const foundingEl = document.getElementById('foundingSpotsLeft');
+      if (foundingEl) {
+        const currentSpots = parseInt(foundingEl.textContent) || 847;
+        if (currentSpots > 0) {
+          foundingEl.textContent = Math.max(0, currentSpots - 1);
+        }
+      }
+
+      simulateSignup();
+    }, nextIncrement);
+  }
+
+  // Start simulated signups after 3 seconds
+  setTimeout(simulateSignup, 3000);
+
+  // ===========================================
+  // FOUNDING SPOTS URGENCY
+  // ===========================================
+  function updateFoundingSpots() {
+    const foundingEl = document.getElementById('foundingSpotsLeft');
+    if (!foundingEl) return;
+
+    // Calculate spots based on waitlist count
+    // 1000 founding spots - current signups = spots left
+    const waitlistEl = document.getElementById('waitlistCount');
+    const currentSignups = parseInt(waitlistEl?.textContent) || 247;
+    const spotsLeft = Math.max(0, 1000 - currentSignups);
+    foundingEl.textContent = spotsLeft;
+  }
+
+  // Initial founding spots calculation
+  updateFoundingSpots();
+
+  // ===========================================
+  // REFERRAL CODE SYSTEM
+  // ===========================================
+  let userReferralCode = localStorage.getItem('suppersafe_referral_code');
+  let userQueuePosition = parseInt(localStorage.getItem('suppersafe_queue_position')) || null;
+
+  function generateReferralCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'SUPPER-';
+    for (let i = 0; i < 4; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  function initReferralSystem(email) {
+    // Generate code if not exists
+    if (!userReferralCode) {
+      userReferralCode = generateReferralCode();
+      localStorage.setItem('suppersafe_referral_code', userReferralCode);
+    }
+
+    // Set queue position based on current waitlist
+    if (!userQueuePosition) {
+      const waitlistEl = document.getElementById('waitlistCount');
+      userQueuePosition = parseInt(waitlistEl?.textContent) || 248;
+      localStorage.setItem('suppersafe_queue_position', userQueuePosition);
+    }
+
+    // Update UI
+    const codeInput = document.getElementById('referralCodeInput');
+    if (codeInput) codeInput.value = userReferralCode;
+
+    const positionEl = document.getElementById('queuePosition');
+    if (positionEl) positionEl.textContent = `#${userQueuePosition}`;
+
+    // Check URL for referral param (someone used a referral link)
+    const urlParams = new URLSearchParams(window.location.search);
+    const referredBy = urlParams.get('ref');
+    if (referredBy && referredBy !== userReferralCode) {
+      localStorage.setItem('suppersafe_referred_by', referredBy);
+    }
+  }
+
+  // Update showSuccess to init referral system
+  const originalShowSuccess = showSuccess;
+  showSuccess = function(msg) {
+    originalShowSuccess(msg);
+    initReferralSystem();
+  };
+
+  // Referral button handlers (only run after DOM ready)
+  document.addEventListener('DOMContentLoaded', function() {
+    // Copy referral code
+    const copyCodeBtn = document.getElementById('copyReferralCode');
+    if (copyCodeBtn) {
+      copyCodeBtn.addEventListener('click', async () => {
+        const code = document.getElementById('referralCodeInput')?.value || userReferralCode;
+        await navigator.clipboard.writeText(code);
+        copyCodeBtn.textContent = 'Copied!';
+        copyCodeBtn.classList.add('copied');
+        showToast('Code copied!');
+        setTimeout(() => {
+          copyCodeBtn.textContent = 'Copy';
+          copyCodeBtn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Share on Twitter
+    const twitterBtn = document.getElementById('referralTwitter');
+    if (twitterBtn) {
+      twitterBtn.addEventListener('click', () => {
+        const code = userReferralCode || 'SUPPER';
+        const text = `I just signed up for SupperSafe - real-time restaurant health alerts for Toronto.\n\nUse my code ${code} to jump ahead in line:\nsuppersafe.com?ref=${code}`;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+      });
+    }
+
+    // Share on WhatsApp
+    const whatsappBtn = document.getElementById('referralWhatsapp');
+    if (whatsappBtn) {
+      whatsappBtn.addEventListener('click', () => {
+        const code = userReferralCode || 'SUPPER';
+        const text = `Hey! I signed up for this app that alerts you when Toronto restaurants fail health inspections. Pretty useful tbh.\n\nUse my code to jump the line: ${code}\nsuppersafe.com?ref=${code}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+      });
+    }
+
+    // Copy referral link
+    const linkBtn = document.getElementById('referralLink');
+    if (linkBtn) {
+      linkBtn.addEventListener('click', async () => {
+        const code = userReferralCode || 'SUPPER';
+        const link = `https://suppersafe.com?ref=${code}`;
+        await navigator.clipboard.writeText(link);
+        showToast('Link copied!');
+      });
+    }
+  });
+
+  // If already signed up, init referral system
+  if (localStorage.getItem('suppersafe_unlocked') === 'true' && userReferralCode) {
+    initReferralSystem();
+  }
+</script>
+
+</body>
+</html>
