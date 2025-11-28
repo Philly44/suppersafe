@@ -580,12 +580,6 @@
         font-size: 9px;
       }
 
-      /* Mobile urgency badge */
-      .urgency-badge {
-        font-size: 11px;
-        padding: 5px 10px;
-      }
-
       /* Mobile referral section */
       .referral-box {
         padding: 14px;
@@ -740,35 +734,6 @@
       color: rgba(255,255,255,0.4);
       line-height: 1;
       padding-top: 2px;
-    }
-
-    /* Urgency badge */
-    .urgency-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      color: #DC2626;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .urgency-badge .pulse {
-      width: 8px;
-      height: 8px;
-      background: #DC2626;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
     }
 
     /* Live counter animation */
@@ -2580,11 +2545,6 @@
           </div>
         </div>
 
-        <div class="urgency-badge">
-          <span class="pulse"></span>
-          <span id="foundingSpotsLeft">253</span> founding spots left
-        </div>
-
         <h2 class="display">Become a Founding Member</h2>
         <p class="signup-desc">
           <strong class="founding-value">6 months FREE</strong>, then just <strong class="founding-value">$3.99/mo</strong> locked for life.
@@ -4024,39 +3984,12 @@
         if (el) el.textContent = displayCount;
       });
 
-      // Decrease founding spots
-      const foundingEl = document.getElementById('foundingSpotsLeft');
-      if (foundingEl) {
-        const currentSpots = parseInt(foundingEl.textContent) || 253;
-        if (currentSpots > 0) {
-          foundingEl.textContent = Math.max(0, currentSpots - 1);
-        }
-      }
-
       simulateSignup();
     }, nextIncrement);
   }
 
   // Start simulated signups after 3 seconds
   setTimeout(simulateSignup, 3000);
-
-  // ===========================================
-  // FOUNDING SPOTS URGENCY
-  // ===========================================
-  function updateFoundingSpots() {
-    const foundingEl = document.getElementById('foundingSpotsLeft');
-    if (!foundingEl) return;
-
-    // Calculate spots based on waitlist count
-    // 500 founding spots - current signups = spots left
-    const waitlistEl = document.getElementById('waitlistCount');
-    const currentSignups = parseInt(waitlistEl?.textContent) || 247;
-    const spotsLeft = Math.max(0, 500 - currentSignups);
-    foundingEl.textContent = spotsLeft;
-  }
-
-  // Initial founding spots calculation
-  updateFoundingSpots();
 
   // ===========================================
   // REFERRAL CODE SYSTEM
