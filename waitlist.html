@@ -608,7 +608,21 @@
         .eq('email', email)
         .single();
 
-      if (error || !data) {
+      if (error) {
+        // Table might not exist or other error
+        if (error.code === '42P01' || error.message?.includes('does not exist')) {
+          errorEl.textContent = 'Lookup not available yet. Try the same browser you signed up on.';
+        } else if (error.code === 'PGRST116') {
+          errorEl.textContent = 'Email not found. Have you signed up?';
+        } else {
+          errorEl.textContent = 'Email not found. Have you signed up?';
+        }
+        btn.disabled = false;
+        btn.textContent = 'Find My Spot';
+        return;
+      }
+
+      if (!data) {
         errorEl.textContent = 'Email not found. Have you signed up?';
         btn.disabled = false;
         btn.textContent = 'Find My Spot';
@@ -623,7 +637,8 @@
       window.history.replaceState({}, '', newUrl);
 
     } catch (err) {
-      errorEl.textContent = 'Something went wrong. Try again.';
+      console.warn('Email lookup error:', err);
+      errorEl.textContent = 'Lookup not available. Try the same browser you signed up on.';
       btn.disabled = false;
       btn.textContent = 'Find My Spot';
     }

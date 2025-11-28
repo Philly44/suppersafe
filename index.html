@@ -3660,13 +3660,87 @@
   // Auth
   async function signUpWithEmail(email) {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      // 1. Send magic link (this is required - fail if it errors)
+      const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: { emailRedirectTo: window.location.origin }
       });
-      if (error) throw error;
+      if (authError) throw authError;
+
+      // 2. Generate referral code
+      const code = generateReferralCode();
+
+      // 3. Try to get next queue position via RPC (fail-safe: use fallback)
+      let queuePosition = 248;
+      try {
+        const { data: positionData, error: rpcError } = await supabase.rpc('get_next_queue_position');
+        if (!rpcError && positionData) {
+          queuePosition = positionData;
+        }
+      } catch (e) {
+        console.warn('RPC get_next_queue_position not available, using fallback');
+        // Fallback: estimate based on current waitlist count display
+        const waitlistEl = document.getElementById('waitlistCount');
+        queuePosition = parseInt(waitlistEl?.textContent) || 248;
+      }
+
+      // 4. Get referrer code from localStorage (if they came via referral link)
+      const referredBy = localStorage.getItem('suppersafe_referred_by') || null;
+
+      // 5. Try to insert into waitlist table (fail-safe: continue if table doesn't exist)
+      try {
+        const { error: insertError } = await supabase
+          .from('waitlist')
+          .insert({
+            email: email.toLowerCase(),
+            referral_code: code,
+            queue_position: queuePosition,
+            referred_by: referredBy
+          });
+
+        if (insertError) {
+          // If duplicate email, fetch existing record
+          if (insertError.code === '23505') {
+            const { data: existingUser } = await supabase
+              .from('waitlist')
+              .select('referral_code, queue_position')
+              .eq('email', email.toLowerCase())
+              .single();
+
+            if (existingUser) {
+              localStorage.setItem('suppersafe_referral_code', existingUser.referral_code);
+              localStorage.setItem('suppersafe_queue_position', existingUser.queue_position);
+            }
+          } else {
+            console.warn('Waitlist insert failed:', insertError.message);
+            // Continue anyway - save to localStorage
+            localStorage.setItem('suppersafe_referral_code', code);
+            localStorage.setItem('suppersafe_queue_position', queuePosition);
+          }
+        } else {
+          // 6. If they were referred, try to increment referrer's count
+          if (referredBy) {
+            try {
+              await supabase.rpc('increment_referrer_count', { referrer_code: referredBy });
+            } catch (e) {
+              console.warn('increment_referrer_count RPC not available');
+            }
+          }
+
+          // 7. Save to localStorage
+          localStorage.setItem('suppersafe_referral_code', code);
+          localStorage.setItem('suppersafe_queue_position', queuePosition);
+        }
+      } catch (e) {
+        console.warn('Waitlist table not available, using localStorage only');
+        localStorage.setItem('suppersafe_referral_code', code);
+        localStorage.setItem('suppersafe_queue_position', queuePosition);
+      }
+
+      localStorage.setItem('suppersafe_unlocked', 'true');
       showSuccess('Check your email to confirm.');
       hasSignedUp = true;
+
     } catch (error) {
       showError(error.message || 'Something went wrong.');
     }
