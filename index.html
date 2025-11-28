@@ -102,6 +102,31 @@
       color: #8B6914;
     }
 
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .my-spot-link {
+      display: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #2D5A3D;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .my-spot-link:hover {
+      background: rgba(45, 90, 61, 0.1);
+    }
+
+    .my-spot-link.visible {
+      display: block;
+    }
+
     /* Hero gradient background */
     .hero-wrapper {
       background: linear-gradient(180deg, #F5EDE4 0%, #FAF9F7 50%, #FAF9F7 100%);
@@ -876,6 +901,13 @@
 
     .waitlist-link:hover {
       color: #F97316;
+    }
+
+    .bookmark-hint {
+      text-align: center;
+      font-size: 12px;
+      color: #A09A8F;
+      margin-top: 8px;
     }
 
     .btn-primary:active {
@@ -2369,7 +2401,10 @@
       </div>
       <span class="logo-text">suppersafe</span>
     </div>
-    <div class="tag">Coming to Toronto</div>
+    <div class="nav-right">
+      <a href="waitlist.html" class="my-spot-link" id="mySpotLink">My Spot</a>
+      <div class="tag">Coming to Toronto</div>
+    </div>
   </nav>
 
   <main class="hero">
@@ -2506,7 +2541,8 @@
             </div>
             <p class="referral-stats"><span id="referralCount">0</span> friends joined · <span id="spotsJumped">0</span> spots jumped</p>
           </div>
-          <a href="waitlist.html" class="waitlist-link">View full dashboard →</a>
+          <a href="waitlist.html" class="waitlist-link" id="waitlistDashboardLink">View full dashboard →</a>
+          <p class="bookmark-hint">Bookmark this link to check your spot anytime</p>
         </div>
       </div>
     </div>
@@ -2767,6 +2803,16 @@
   // Check if already unlocked (localStorage)
   if (localStorage.getItem('suppersafe_unlocked') === 'true') {
     isUnlocked = true;
+
+    // Show "My Spot" link in nav
+    const mySpotLink = document.getElementById('mySpotLink');
+    const userCode = localStorage.getItem('suppersafe_referral_code');
+    if (mySpotLink) {
+      mySpotLink.classList.add('visible');
+      if (userCode) {
+        mySpotLink.href = `waitlist.html?code=${userCode}`;
+      }
+    }
   }
 
   function debounce(func, wait) {
@@ -3857,6 +3903,17 @@
 
     const positionEl = document.getElementById('queuePosition');
     if (positionEl) positionEl.textContent = `#${userQueuePosition}`;
+
+    // Update waitlist dashboard link with code param for bookmarking
+    const waitlistLink = document.getElementById('waitlistDashboardLink');
+    if (waitlistLink) waitlistLink.href = `waitlist.html?code=${userReferralCode}`;
+
+    // Show "My Spot" link in nav
+    const mySpotLink = document.getElementById('mySpotLink');
+    if (mySpotLink) {
+      mySpotLink.classList.add('visible');
+      mySpotLink.href = `waitlist.html?code=${userReferralCode}`;
+    }
 
     // Check URL for referral param (someone used a referral link)
     const urlParams = new URLSearchParams(window.location.search);

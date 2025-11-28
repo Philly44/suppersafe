@@ -114,6 +114,69 @@
       background: #EA580C;
     }
 
+    .lookup-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid #E8E4DD;
+    }
+
+    .lookup-divider {
+      font-size: 13px;
+      color: #A09A8F;
+      margin-bottom: 16px;
+    }
+
+    .lookup-form {
+      display: flex;
+      gap: 8px;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .lookup-input {
+      flex: 1;
+      padding: 12px 14px;
+      font-size: 14px;
+      border: 1.5px solid #D4D0C8;
+      border-radius: 8px;
+      background: white;
+      font-family: inherit;
+    }
+
+    .lookup-input:focus {
+      outline: none;
+      border-color: #2D5A3D;
+    }
+
+    .lookup-btn {
+      padding: 12px 18px;
+      background: #2D5A3D;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease;
+    }
+
+    .lookup-btn:hover {
+      background: #234A31;
+    }
+
+    .lookup-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .lookup-error {
+      font-size: 13px;
+      color: #DC2626;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
     .dashboard {
       display: none;
     }
@@ -373,6 +436,15 @@
     <h1>Join the Waitlist</h1>
     <p>You haven't signed up yet. Join now to get early access and founding member pricing.</p>
     <a href="index.html" class="btn-primary">Sign Up Now</a>
+
+    <div class="lookup-section">
+      <p class="lookup-divider">Already signed up?</p>
+      <div class="lookup-form">
+        <input type="email" class="lookup-input" id="lookupEmail" placeholder="Enter your email">
+        <button class="lookup-btn" id="lookupBtn">Find My Spot</button>
+      </div>
+      <p class="lookup-error" id="lookupError"></p>
+    </div>
   </div>
 
   <div class="dashboard" id="dashboard">
@@ -444,7 +516,12 @@
 
 <div class="toast" id="toast">Copied!</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const SUPABASE_URL = 'https://txxkimndpqprbqhlknrk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4eGtpbW5kcHFwcmJxaGxrbnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTE1ODgsImV4cCI6MjA3OTc2NzU4OH0.4Zm1ShwG-_kc_E0tkltEBnNzfWdVeb7gRDh6b3-pCb8';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const toast = document.getElementById('toast');
 
   function showToast(msg) {
@@ -453,20 +530,15 @@
     setTimeout(() => toast.classList.remove('visible'), 2500);
   }
 
-  // Check if signed up
-  const isSignedUp = localStorage.getItem('suppersafe_unlocked') === 'true';
-  const referralCode = localStorage.getItem('suppersafe_referral_code');
-  const queuePosition = localStorage.getItem('suppersafe_queue_position');
-
-  if (isSignedUp && referralCode) {
+  // Show dashboard with user data
+  function showDashboard(code, position) {
     document.getElementById('notSignedUp').style.display = 'none';
     document.getElementById('dashboard').classList.add('active');
 
     // Set referral code
-    document.getElementById('referralCode').value = referralCode;
+    document.getElementById('referralCode').value = code;
 
     // Set position
-    const position = queuePosition || '248';
     document.getElementById('positionNumber').textContent = `#${position}`;
 
     // Position message
@@ -478,7 +550,91 @@
     } else {
       document.getElementById('positionMessage').textContent = 'Share to jump ahead!';
     }
+
+    // Store in localStorage for future visits
+    localStorage.setItem('suppersafe_unlocked', 'true');
+    localStorage.setItem('suppersafe_referral_code', code);
+    localStorage.setItem('suppersafe_queue_position', position);
   }
+
+  // Check URL for code param (bookmarked link)
+  const urlParams = new URLSearchParams(window.location.search);
+  const codeFromUrl = urlParams.get('code');
+
+  // Check localStorage
+  const isSignedUp = localStorage.getItem('suppersafe_unlocked') === 'true';
+  const referralCode = localStorage.getItem('suppersafe_referral_code');
+  const queuePosition = localStorage.getItem('suppersafe_queue_position');
+
+  // Priority: URL code > localStorage
+  if (codeFromUrl) {
+    // Validate code format and show dashboard
+    if (/^SUPPER-[A-Z0-9]{4}$/.test(codeFromUrl)) {
+      // For now, use code from URL with estimated position
+      // In production, this would query Supabase for actual position
+      const estimatedPosition = queuePosition || '248';
+      showDashboard(codeFromUrl, estimatedPosition);
+    }
+  } else if (isSignedUp && referralCode) {
+    showDashboard(referralCode, queuePosition || '248');
+  }
+
+  // Email lookup handler
+  document.getElementById('lookupBtn').addEventListener('click', async () => {
+    const email = document.getElementById('lookupEmail').value.trim().toLowerCase();
+    const errorEl = document.getElementById('lookupError');
+    const btn = document.getElementById('lookupBtn');
+
+    errorEl.textContent = '';
+
+    if (!email) {
+      errorEl.textContent = 'Please enter your email';
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errorEl.textContent = 'Please enter a valid email';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Looking up...';
+
+    try {
+      // Query Supabase for user by email
+      const { data, error } = await supabase
+        .from('waitlist')
+        .select('referral_code, queue_position')
+        .eq('email', email)
+        .single();
+
+      if (error || !data) {
+        errorEl.textContent = 'Email not found. Have you signed up?';
+        btn.disabled = false;
+        btn.textContent = 'Find My Spot';
+        return;
+      }
+
+      // Found! Show dashboard
+      showDashboard(data.referral_code, data.queue_position);
+
+      // Update URL for bookmarking
+      const newUrl = `${window.location.pathname}?code=${data.referral_code}`;
+      window.history.replaceState({}, '', newUrl);
+
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      btn.disabled = false;
+      btn.textContent = 'Find My Spot';
+    }
+  });
+
+  // Allow Enter key to submit
+  document.getElementById('lookupEmail').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      document.getElementById('lookupBtn').click();
+    }
+  });
 
   // Countdown
   const launchDate = new Date('2026-01-01T00:00:00-05:00');
@@ -517,21 +673,22 @@
     }, 2000);
   });
 
-  // Share buttons
+  // Share buttons - read from localStorage at click time (may have been updated by showDashboard)
   document.getElementById('shareTwitter').addEventListener('click', () => {
-    const code = referralCode || 'SUPPER';
-    const text = `I'm #${queuePosition || '248'} on the SupperSafe waitlist! 🍽️\n\nGet real-time alerts when Toronto restaurants fail health inspections.\n\nUse my code ${code} to jump ahead:\nsuppersafe.com?ref=${code}`;
+    const code = localStorage.getItem('suppersafe_referral_code') || 'SUPPER';
+    const position = localStorage.getItem('suppersafe_queue_position') || '248';
+    const text = `I'm #${position} on the SupperSafe waitlist!\n\nGet real-time alerts when Toronto restaurants fail health inspections.\n\nUse my code ${code} to jump ahead:\nsuppersafe.com?ref=${code}`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
   });
 
   document.getElementById('shareWhatsapp').addEventListener('click', () => {
-    const code = referralCode || 'SUPPER';
+    const code = localStorage.getItem('suppersafe_referral_code') || 'SUPPER';
     const text = `Hey! I signed up for SupperSafe - it alerts you when Toronto restaurants fail health inspections.\n\nUse my code to jump the line: ${code}\nsuppersafe.com?ref=${code}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   });
 
   document.getElementById('shareLink').addEventListener('click', async () => {
-    const code = referralCode || 'SUPPER';
+    const code = localStorage.getItem('suppersafe_referral_code') || 'SUPPER';
     const link = `https://suppersafe.com?ref=${code}`;
     await navigator.clipboard.writeText(link);
     showToast('Link copied!');
