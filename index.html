@@ -1278,6 +1278,14 @@
     .severity-dot.significant { background: #D97706; }
     .severity-dot.minor { background: #9CA3AF; }
 
+    .severity-legend {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px;
+      color: #9CA3AF;
+      margin-top: 8px;
+      text-align: center;
+    }
+
     /* What they found */
     .findings-section {
       background: #FAF9F7;
@@ -2711,6 +2719,7 @@
           <div class="severity-pill"><span class="severity-dot significant"></span><span id="significantCount">0</span> significant</div>
           <div class="severity-pill"><span class="severity-dot minor"></span><span id="minorCount">0</span> minor</div>
         </div>
+        <p class="severity-legend">Crucial = immediate health risk • Significant = potential risk • Minor = administrative</p>
       </div>
 
       <div class="findings-section" id="findingsSection" style="display: none;">
