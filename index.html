@@ -325,23 +325,21 @@
       }
     }
 
-    .search-label {
+    .search-main-label {
+      display: block;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      color: #2D5A3D;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
       font-weight: 600;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: #1a1a1a;
+      margin-bottom: 12px;
     }
 
-    .search-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 500;
-      letter-spacing: -0.02em;
-      font-size: 16px;
-      margin-bottom: 12px;
-      color: #1a1a1a;
+    @media (max-width: 600px) {
+      .search-main-label {
+        font-size: 20px;
+        margin-bottom: 14px;
+      }
     }
 
     .search-input-wrapper {
@@ -360,6 +358,14 @@
       background: white;
     }
 
+    @media (max-width: 600px) {
+      .search-input {
+        padding: 16px 18px;
+        font-size: 17px;
+        border-radius: 8px;
+      }
+    }
+
     .search-input:focus {
       border-color: #2D5A3D;
       box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.1);
@@ -369,11 +375,26 @@
       color: #A09A8F;
     }
 
-    .search-hint {
+    .search-source {
       font-size: 12px;
-      color: #A09A8F;
-      margin-top: 8px;
+      color: #6B665C;
+      margin-top: 10px;
       font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.4;
+    }
+
+    .search-free-badge {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #2D5A3D;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 12px;
+      padding: 4px 10px;
+      background: rgba(45, 90, 61, 0.08);
+      border-radius: 4px;
     }
 
     .search-results {
@@ -485,6 +506,11 @@
       .signup-card {
         position: static;
         order: 2;
+        background: linear-gradient(to bottom, #F7F5F2, #FAF9F7);
+        border: none;
+        border-radius: 0;
+        margin: 32px -32px 0;
+        padding: 32px;
       }
 
       .hero-content {
@@ -498,8 +524,8 @@
     
     @media (max-width: 600px) {
       .signup-card {
-        padding: 20px;
-        margin: 0 -4px;
+        padding: 24px 20px;
+        margin: 24px -20px 0;
       }
 
       .signup-card h2 {
@@ -892,6 +918,13 @@
       flex: none;
       width: 44px;
       padding: 10px;
+    }
+
+    .referral-nudge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: #2D5A3D;
+      font-weight: 500;
     }
 
     .referral-stats {
@@ -2470,18 +2503,18 @@
       
       <h1>That restaurant has 3 health violations. <span>You just don't know it yet.</span></h1>
       
-      <p class="hero-lead">Get alerts when your favourite Toronto restaurants fail health inspections. In plain English. Within hours.</p>
+      <p class="hero-lead">Instant alerts when a Toronto restaurant fails a health inspection.</p>
       
       <p class="hero-sub">Last month, 47 Toronto restaurants got critical violations. Some of them are places you eat at.</p>
 
       <div class="restaurant-search">
-        <p class="search-label">Try it free</p>
-        <p class="search-title">Look up any Toronto restaurant</p>
+        <label for="restaurantSearch" class="search-main-label">Search 17,000+ Toronto restaurants</label>
         <div class="search-input-wrapper">
           <input type="text" class="search-input" id="restaurantSearch" placeholder="e.g., Pai Northern Thai Kitchen" autocomplete="off">
           <div class="search-results" id="searchResults"></div>
         </div>
-        <p class="search-hint">Search from 17,000+ inspected establishments</p>
+        <p class="search-source">Data from Toronto Public Health. Updated within hours of new inspections.</p>
+        <p class="search-free-badge">Try it free</p>
         
         <div class="steps-inline desktop-only">
           <div class="step-inline">
@@ -2598,7 +2631,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
               </button>
             </div>
-            <p class="referral-stats"><span id="referralCount">0</span> friends joined · <span id="spotsJumped">0</span> spots jumped</p>
+            <p class="referral-nudge" id="referralNudge">Share your link to jump the line</p>
+            <p class="referral-stats" id="referralStats" style="display: none;"><span id="referralCount">0</span> friends joined · <span id="spotsJumped">0</span> spots jumped</p>
           </div>
           <a href="waitlist.html" class="waitlist-link" id="waitlistDashboardLink">View full dashboard →</a>
           <p class="bookmark-hint">Bookmark this link to check your spot anytime</p>
