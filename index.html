@@ -2664,8 +2664,8 @@
 </div>
 
 <!-- MODAL OVERLAY -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-container" id="modalContainer">
+<div class="modal-overlay" id="modalOverlay" role="presentation">
+  <div class="modal-container" id="modalContainer" role="dialog" aria-modal="true" aria-label="Restaurant details">
     <!-- Report Card or Gate will be inserted here -->
   </div>
 </div>
@@ -2980,14 +2980,46 @@
     setTimeout(() => toast.classList.remove('visible'), 2500);
   }
 
+  let previouslyFocusedElement = null;
+
+  function handleEscapeKey(e) {
+    if (e.key === 'Escape') closeModal();
+  }
+
+  function handleFocusTrap(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = modalContainer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
   function openModal() {
+    previouslyFocusedElement = document.activeElement;
     modalOverlay.classList.add('active');
     document.body.classList.add('modal-open');
+    document.addEventListener('keydown', handleEscapeKey);
+    document.addEventListener('keydown', handleFocusTrap);
+    // Focus first focusable element after content loads
+    setTimeout(() => {
+      const firstFocusable = modalContainer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (firstFocusable) firstFocusable.focus();
+    }, 100);
   }
 
   function closeModal() {
     modalOverlay.classList.remove('active');
     document.body.classList.remove('modal-open');
+    document.removeEventListener('keydown', handleEscapeKey);
+    document.removeEventListener('keydown', handleFocusTrap);
+    if (previouslyFocusedElement) previouslyFocusedElement.focus();
   }
 
   function escapeHtml(text) {
@@ -3119,6 +3151,7 @@
     const clone = template.content.cloneNode(true);
     modalContainer.innerHTML = '';
     modalContainer.appendChild(clone);
+    modalContainer.setAttribute('aria-label', 'Join waitlist for unlimited searches');
 
     document.getElementById('gateCount').textContent = document.getElementById('waitlistCount').textContent;
 
@@ -3447,6 +3480,7 @@
     const clone = template.content.cloneNode(true);
     modalContainer.innerHTML = '';
     modalContainer.appendChild(clone);
+    modalContainer.setAttribute('aria-label', `Health inspection report for ${name}`);
 
     // Set initial values
     document.getElementById('reportName').textContent = name;
