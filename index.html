@@ -3102,18 +3102,26 @@
     try {
       const { data, error } = await supabase
         .from('dinesafe')
-        .select('establishment_name, inspection_date, status')
+        .select('establishment_name, inspection_date, establishment_status')
         .order('inspection_date', { ascending: false })
-        .limit(20);
+        .limit(40);
 
       if (error || !data?.length) {
         track.parentElement.style.display = 'none';
         return;
       }
 
-      const items = data.map(d => {
+      // Dedupe by establishment name (keep most recent)
+      const seen = new Set();
+      const unique = data.filter(d => {
+        if (seen.has(d.establishment_name)) return false;
+        seen.add(d.establishment_name);
+        return true;
+      }).slice(0, 20);
+
+      const items = unique.map(d => {
         const date = new Date(d.inspection_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const passed = d.status === 'Pass';
+        const passed = d.establishment_status === 'Pass';
         const statusClass = passed ? 'pass' : 'fail';
         const statusText = passed ? 'Pass' : 'Fail';
         return `<span class="ticker-item">${d.establishment_name} · <span class="${statusClass}">${statusText}</span> · ${date}</span>`;
