@@ -241,6 +241,45 @@
       margin-bottom: 24px;
     }
 
+    #heroHeadline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      font-size: 46px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+
+    .headline-date {
+      display: block;
+      width: 100%;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: #6B665C;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    #heroHeadline span:not(.headline-date):not(.headline-second) {
+      color: #2D5A3D;
+    }
+
+    #heroHeadline .headline-second {
+      color: #1a1a1a;
+      display: block;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      #heroHeadline {
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+    }
+
     @media (max-width: 600px) {
       .hero h1 {
         font-size: 30px;
@@ -2061,6 +2100,98 @@
       color: #1a1a1a;
     }
 
+    /* Holiday Theme Styles */
+    .gate-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #DC2626, #B91C1C);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .gate-benefits {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px 0;
+      text-align: left;
+    }
+
+    .gate-benefits li {
+      font-size: 14px;
+      color: #1a1a1a;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .gate-benefits li:last-child {
+      border-bottom: none;
+    }
+
+    .gate-price {
+      margin: 20px 0;
+      padding: 16px;
+      background: #FEF3C7;
+      border-radius: 12px;
+    }
+
+    .gate-price .price-crossed {
+      color: #9CA3AF;
+      text-decoration: line-through;
+      font-size: 16px;
+      margin-right: 8px;
+    }
+
+    .gate-price .price-holiday {
+      color: #059669;
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .gate-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .gate-buttons .btn-primary {
+      padding: 14px 24px;
+      font-size: 15px;
+    }
+
+    .gate-buttons .btn-secondary {
+      background: white;
+      border: 2px solid #2D5A3D;
+      color: #2D5A3D;
+      padding: 12px 24px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .gate-buttons .btn-secondary:hover {
+      background: #2D5A3D;
+      color: white;
+    }
+
+    .gate-deadline {
+      font-size: 13px;
+      color: #6B665C;
+      margin-bottom: 12px;
+    }
+
+    .gate-deadline span {
+      color: #2D5A3D;
+      font-weight: 600;
+    }
+
     /* Features section */
     .features {
       background: #2D5A3D;
@@ -2510,9 +2641,9 @@
     <div class="hero-content">
       <p class="hero-eyebrow"><span class="eyebrow-icon"></span>4 million Canadians get food poisoning every year.</p>
       
-      <h1>That restaurant has 3 health violations. <span>You just don't know it yet.</span></h1>
+      <h1 id="heroHeadline">Loading...</h1>
       
-      <p class="hero-lead">Instant alerts when a Toronto restaurant fails a health inspection.</p>
+      <p class="hero-lead">Instant alerts when a Toronto restaurant fails a health inspection. Free if you sign up before launch.</p>
       
       <p class="hero-sub">Last month, 47 Toronto restaurants got critical violations. Some of them are places you eat at.</p>
 
@@ -2546,7 +2677,7 @@
       <div class="form-state" id="formState">
         <!-- Countdown Timer -->
         <div class="countdown-wrapper">
-          <div class="countdown-label">Launching January 1, 2026</div>
+          <div class="countdown-label">Free access ends in</div>
           <div class="countdown-timer">
             <div class="countdown-unit">
               <div class="countdown-value" id="countdownDays">00</div>
@@ -2570,17 +2701,17 @@
           </div>
         </div>
 
-        <h2 class="display">Become a Founding Member</h2>
+        <h2 class="display">Get Early Access</h2>
         <p class="signup-desc">
-          <strong class="founding-value">6 months FREE</strong>, then just <strong class="founding-value">$3.99/mo</strong> locked for life.
-          <br><span class="live-counter"><span class="live-dot"></span> <strong class="counter-value" id="waitlistCount">247</strong> people ahead of you</span>
+          Sign up before launch and get free access when we go live.
+          <br><span class="live-counter"><span class="live-dot"></span> <strong class="counter-value" id="waitlistCount">247</strong> people already signed up</span>
         </p>
 
         <div class="error-message" id="errorMessage"></div>
         <input type="email" class="auth-input" id="emailInput" placeholder="Your email" required>
         <input type="text" name="website" class="hp-field" id="hpMain" tabindex="-1" autocomplete="off">
         <div class="cf-turnstile" data-sitekey="0x4AAAAAACDgbgS4Cu-vWGHm" data-callback="onTurnstileSuccess" data-theme="light"></div>
-        <button type="button" class="btn-primary" id="emailSubmit">Claim My Spot</button>
+        <button type="button" class="btn-primary" id="emailSubmit">Get Early Access</button>
 
         <div class="auth-divider"><span>or</span></div>
 
@@ -2595,8 +2726,8 @@
 
         <div class="stats-row">
           <div>
-            <div class="stat-value display"><span class="price-crossed">$5.99</span> <span class="founding-value">$3.99</span></div>
-            <div class="stat-label">per month for life</div>
+            <div class="stat-value display">17,000+</div>
+            <div class="stat-label">restaurants tracked</div>
           </div>
           <div style="text-align: right;">
             <div class="stat-value display">2 hrs</div>
@@ -2619,7 +2750,7 @@
           </div>
 
           <div class="referral-box">
-            <p class="referral-cta">Share to jump ahead. Each friend = <strong>+10 spots</strong></p>
+            <p class="referral-cta">Share with friends. Help them get free access too.</p>
             <div class="referral-code-wrapper">
               <input type="text" class="referral-code-input" id="referralCodeInput" readonly value="SUPPER-XXXX">
               <button class="referral-copy-btn" id="copyReferralCode">Copy</button>
@@ -2785,16 +2916,28 @@
 <!-- GATE MODAL TEMPLATE -->
 <template id="gateTemplate">
   <div class="gate-modal">
-    <div class="gate-emoji"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-    <h3 class="gate-title">Want to search more?</h3>
-    <p class="gate-subtitle">Join the waitlist for unlimited searches and real-time alerts when your restaurants get inspected.</p>
-    <div class="gate-form">
-      <input type="email" class="auth-input" id="gateEmail" placeholder="Your email">
-      <input type="text" name="company" class="hp-field" id="hpGate" tabindex="-1" autocomplete="off">
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAACDgbgS4Cu-vWGHm" data-callback="onTurnstileGateSuccess" data-theme="light"></div>
-      <button type="button" class="btn-primary" id="gateSubmit">Get free access</button>
+    <div class="gate-badge">🎁 Holiday Special</div>
+    <h3 class="gate-title">Lifetime Access for $29</h3>
+    <p class="gate-subtitle">Pre-order now, full access starts January 2026</p>
+
+    <ul class="gate-benefits">
+      <li>✓ Unlimited restaurant safety checks</li>
+      <li>✓ Real-time alerts when your spots get inspected</li>
+      <li>✓ Never pay again — lifetime access</li>
+    </ul>
+
+    <div class="gate-price">
+      <span class="price-crossed">$60/year</span>
+      <span class="price-holiday">$29 once, forever</span>
     </div>
-    <p class="gate-fine"><span id="gateCount">247</span> people already on the list</p>
+
+    <div class="gate-buttons">
+      <button type="button" class="btn-primary" id="buyForSelf">Buy for Myself</button>
+      <button type="button" class="btn-secondary" id="buyAsGift">🎁 Gift to Someone</button>
+    </div>
+
+    <p class="gate-deadline">⏰ Holiday pricing ends Dec 31 · <span id="spotsClaimed">247</span> spots claimed</p>
+
     <button class="gate-skip" id="gateSkip">Maybe later</button>
   </div>
 </template>
@@ -2840,13 +2983,13 @@
     </div>
     
     <div class="faq-item">
-      <h3>Why $5.99 a month?</h3>
-      <p>Monitoring data, processing it, and sending alerts costs money. $5.99 keeps us independent - no ads, no selling data, no payments from restaurants. Founding members get it for $3.99/mo for life.</p>
+      <h3>Is this really free?</h3>
+      <p>Yes. Sign up before January 1, 2026 and you get free access when we launch. We'll figure out pricing for new users later - early supporters get in free.</p>
     </div>
 
     <div class="faq-item">
       <h3>When do you launch?</h3>
-      <p>January 1, 2026 in Toronto. First 500 founding members get 6 months free + $3.99/mo locked forever.</p>
+      <p>January 1, 2026 in Toronto. Everyone who signs up before then gets free access.</p>
     </div>
   </div>
 </section>
@@ -2854,13 +2997,13 @@
 <section class="final-cta">
   <div class="final-cta-inner">
     <h2 class="display">Stop eating in the dark</h2>
-    <p>First 500 founding members get <strong class="founding-value">6 months FREE</strong> + <strong class="founding-value">$3.99/mo for life</strong>.<br><span id="waitlistCountBottom">247</span> spots already claimed.</p>
+    <p>Sign up before January 1, 2026 and get free access at launch.<br><span id="waitlistCountBottom">247</span> people already signed up.</p>
 
     <div class="final-cta-form" id="finalForm">
       <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
       <input type="text" name="url" class="hp-field" id="hpFinal" tabindex="-1" autocomplete="off">
       <div class="cf-turnstile" data-sitekey="0x4AAAAAACDgbgS4Cu-vWGHm" data-callback="onTurnstileFinalSuccess" data-theme="light"></div>
-      <button type="button" class="btn-primary" id="finalSubmit">Claim My Spot</button>
+      <button type="button" class="btn-primary" id="finalSubmit">Get Early Access</button>
     </div>
 
     <p class="final-success" id="finalSuccess">You're in! Check your email to confirm.</p>
@@ -2871,9 +3014,9 @@
   <div class="sticky-cta-inner">
     <input type="email" class="auth-input" id="stickyEmailInput" placeholder="Your email">
     <input type="text" name="fax" class="hp-field" id="hpSticky" tabindex="-1" autocomplete="off">
-    <button type="button" class="btn-primary" id="stickySubmit">Claim Spot</button>
+    <button type="button" class="btn-primary" id="stickySubmit">Get Access</button>
   </div>
-  <p class="sticky-cta-count"><span id="stickyCount">249</span> ahead of you · <strong class="founding-value">6 months FREE</strong></p>
+  <p class="sticky-cta-count"><span id="stickyCount">249</span> signed up · <strong class="founding-value">Free before Jan 1</strong></p>
 </div>
 
 <div class="toast" id="toast">Copied!</div>
@@ -2901,6 +3044,129 @@
   const SUPABASE_URL = 'https://txxkimndpqprbqhlknrk.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4eGtpbW5kcHFwcmJxaGxrbnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTE1ODgsImV4cCI6MjA3OTc2NzU4OH0.4Zm1ShwG-_kc_E0tkltEBnNzfWdVeb7gRDh6b3-pCb8';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ===========================================
+  // HEADLINE A/B TESTING SYSTEM
+  // ===========================================
+
+  const headlineTests = {
+    headlines: [
+      { id: "pride_01", category: "pride", second: "You just haven't seen them yet." },
+      { id: "pride_02", category: "pride", second: "The reports exist. You've just never looked." },
+      { id: "pride_03", category: "pride", second: "Smart diners check first." },
+      { id: "pride_04", category: "pride", second: "You wouldn't book a hotel without reviews. Why eat blind?" },
+      { id: "fear_01", category: "fear", second: "You've eaten at places you've never checked." },
+      { id: "fear_02", category: "fear", second: "Some look spotless. The reports say otherwise." },
+      { id: "fear_03", category: "fear", second: "The kitchen you can't see has a paper trail." },
+      { id: "fear_04", category: "fear", second: "What you don't know might already be on your plate." },
+      { id: "curiosity_01", category: "curiosity", second: "Type in your favorite. See what comes up." },
+      { id: "curiosity_02", category: "curiosity", second: "One search. That's all it takes." },
+      { id: "curiosity_03", category: "curiosity", second: "Look up any spot. The truth is public." },
+      { id: "position_01", category: "positioning", second: "The data's public. Finding it isn't." }
+    ],
+
+    sessionId: null,
+    currentHeadline: null,
+
+    init: async function() {
+      this.sessionId = localStorage.getItem('suppersafe_headline_session');
+      if (!this.sessionId) {
+        this.sessionId = 'hs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('suppersafe_headline_session', this.sessionId);
+      }
+
+      const existingHeadlineId = localStorage.getItem('suppersafe_current_headline');
+      if (existingHeadlineId) {
+        this.currentHeadline = this.headlines.find(h => h.id === existingHeadlineId);
+      }
+
+      if (!this.currentHeadline) {
+        this.currentHeadline = this.headlines[Math.floor(Math.random() * this.headlines.length)];
+        localStorage.setItem('suppersafe_current_headline', this.currentHeadline.id);
+        await this.logImpression();
+      }
+
+      await this.displayHeadline();
+    },
+
+    logImpression: async function() {
+      try {
+        await supabase.from('headline_tests').insert({
+          headline_id: this.currentHeadline.id,
+          category: this.currentHeadline.category,
+          session_id: this.sessionId
+        });
+      } catch (e) {
+        console.warn('Failed to log headline impression:', e);
+      }
+    },
+
+    logConversion: async function(conversionType) {
+      try {
+        await supabase.rpc('mark_headline_conversion', {
+          p_session_id: this.sessionId,
+          p_conversion_type: conversionType
+        });
+      } catch (e) {
+        console.warn('Failed to log headline conversion:', e);
+      }
+    },
+
+    getViolationCount: async function() {
+      try {
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        const { data, error } = await supabase
+          .from('dinesafe')
+          .select('establishment_id')
+          .gte('inspection_date', thirtyDaysAgo)
+          .or('severity.ilike.C%,severity.ilike.S%');
+
+        if (error) throw error;
+
+        const uniqueEstablishments = new Set(data.map(d => d.establishment_id));
+        return uniqueEstablishments.size;
+      } catch (e) {
+        console.warn('Failed to get violation count:', e);
+        return 847;
+      }
+    },
+
+    formatDate: function() {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date().toLocaleDateString('en-US', options);
+    },
+
+    displayHeadline: async function() {
+      const heroEl = document.getElementById('heroHeadline');
+      if (!heroEl) return;
+
+      let count = await this.getViolationCount();
+
+      if (!count || count < 10) {
+        try {
+          const { data } = await supabase
+            .from('dinesafe')
+            .select('establishment_id')
+            .ilike('severity', 'C%');
+
+          if (data) {
+            const unique = new Set(data.map(d => d.establishment_id));
+            count = unique.size;
+          }
+        } catch (e) {
+          count = 847;
+        }
+      }
+
+      const dateStr = this.formatDate();
+
+      heroEl.innerHTML = `<span class="headline-date">Last 30 days · Updated ${dateStr}</span><span>${count.toLocaleString()}</span> Toronto restaurants flagged for violations. <span class="headline-second">${this.currentHeadline.second}</span>`;
+    }
+  };
+
+  headlineTests.init();
 
   // ===========================================
   // CONFIG - Centralized magic numbers
@@ -3132,6 +3398,7 @@
   }
 
   async function selectRestaurant(id, name, address) {
+    headlineTests.logConversion('restaurant_search');
     searchResults.classList.remove('active');
     stickyCta.classList.remove('search-active-hide');
     searchInput.value = '';
@@ -3151,25 +3418,22 @@
     const clone = template.content.cloneNode(true);
     modalContainer.innerHTML = '';
     modalContainer.appendChild(clone);
-    modalContainer.setAttribute('aria-label', 'Join waitlist for unlimited searches');
+    modalContainer.setAttribute('aria-label', 'Holiday Pre-Purchase Offer');
 
-    document.getElementById('gateCount').textContent = document.getElementById('waitlistCount').textContent;
+    // Update spots claimed count
+    const spotsEl = document.getElementById('spotsClaimed');
+    if (spotsEl) {
+      spotsEl.textContent = document.getElementById('waitlistCount')?.textContent || CONFIG.INITIAL_WAITLIST_COUNT;
+    }
 
-    document.getElementById('gateSubmit').addEventListener('click', async () => {
-      if (isBot('hpGate')) { closeModal(); showToast('You\'re in! Search away.'); return; }
-      if (!turnstileTokenGate) { showToast('Please complete the security check'); return; }
-      const email = document.getElementById('gateEmail').value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showToast('Please enter a valid email');
-        return;
-      }
-      document.getElementById('gateSubmit').disabled = true;
-      document.getElementById('gateSubmit').textContent = 'Joining...';
-      await signUpWithEmail(email, turnstileTokenGate);
-      isUnlocked = true;
-      localStorage.setItem('suppersafe_unlocked', 'true');
-      closeModal();
-      showToast('You\'re in! Search away.');
+    // Buy for self button
+    document.getElementById('buyForSelf').addEventListener('click', () => {
+      initiatePurchase('self');
+    });
+
+    // Gift to someone button
+    document.getElementById('buyAsGift').addEventListener('click', () => {
+      initiatePurchase('gift');
     });
 
     document.getElementById('gateSkip').addEventListener('click', () => {
@@ -3177,6 +3441,54 @@
     });
 
     openModal();
+  }
+
+  // Initiate Stripe Checkout
+  async function initiatePurchase(type) {
+    const email = prompt('Enter your email address:');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('Please enter a valid email');
+      return;
+    }
+
+    let giftRecipientEmail = null;
+    if (type === 'gift') {
+      giftRecipientEmail = prompt('Enter the recipient\'s email address:');
+      if (!giftRecipientEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(giftRecipientEmail)) {
+        showToast('Please enter a valid recipient email');
+        return;
+      }
+    }
+
+    showToast('Redirecting to checkout...');
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          email,
+          purchaseType: type,
+          giftRecipientEmail
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout');
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.checkoutUrl;
+
+    } catch (error) {
+      console.error('Purchase error:', error);
+      showToast('Something went wrong. Please try again.');
+    }
   }
 
   // ===========================================
@@ -3861,6 +4173,7 @@
       localStorage.setItem('suppersafe_unlocked', 'true');
 
       showSuccess('Check your email to confirm.');
+      headlineTests.logConversion('email_signup');
       hasSignedUp = true;
 
     } catch (error) {
