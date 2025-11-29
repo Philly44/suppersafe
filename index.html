@@ -42,6 +42,7 @@
       background: #FAF9F7;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     body.modal-open {
@@ -381,14 +382,15 @@
     .inspection-ticker {
       margin-top: 16px;
       overflow: hidden;
+      max-width: 100%;
       mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
       -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
     }
 
     .ticker-track {
-      display: flex;
+      display: inline-flex;
       gap: 32px;
-      animation: ticker-scroll 60s linear infinite;
+      animation: ticker-scroll 90s linear infinite;
       white-space: nowrap;
     }
 
