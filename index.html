@@ -2902,6 +2902,16 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4eGtpbW5kcHFwcmJxaGxrbnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTE1ODgsImV4cCI6MjA3OTc2NzU4OH0.4Zm1ShwG-_kc_E0tkltEBnNzfWdVeb7gRDh6b3-pCb8';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // ===========================================
+  // CONFIG - Centralized magic numbers
+  // ===========================================
+  const CONFIG = {
+    INITIAL_WAITLIST_COUNT: 247,
+    QUEUE_START_POSITION: 248,
+    FOUNDING_MEMBER_CAP: 500,
+    SPOTS_PER_REFERRAL: 10,
+  };
+
   // State
   let searchCount = 0;
   let isUnlocked = false;
@@ -3992,7 +4002,7 @@
   // ===========================================
   // LIVE SIGNUP COUNTER ANIMATION
   // ===========================================
-  let baseCount = 247;
+  let baseCount = CONFIG.INITIAL_WAITLIST_COUNT;
   let displayCount = baseCount;
 
   function simulateSignup() {
@@ -4048,7 +4058,7 @@
     // Set queue position based on current waitlist
     if (!userQueuePosition) {
       const waitlistEl = document.getElementById('waitlistCount');
-      userQueuePosition = parseInt(waitlistEl?.textContent) || 248;
+      userQueuePosition = parseInt(waitlistEl?.textContent) || CONFIG.QUEUE_START_POSITION;
       localStorage.setItem('suppersafe_queue_position', userQueuePosition);
     }
 
@@ -4087,6 +4097,14 @@
 
   // Referral button handlers (only run after DOM ready)
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize counters from CONFIG
+    ['waitlistCount', 'waitlistCountBottom', 'stickyCount'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = CONFIG.INITIAL_WAITLIST_COUNT;
+    });
+    const queueEl = document.getElementById('queuePosition');
+    if (queueEl) queueEl.textContent = '#' + CONFIG.QUEUE_START_POSITION;
+
     // Copy referral code
     const copyCodeBtn = document.getElementById('copyReferralCode');
     if (copyCodeBtn) {
