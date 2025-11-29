@@ -3002,7 +3002,6 @@
 
   const icons = {
     // UI Icons
-    search: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
     share: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>',
 
     // Alert/Warning Icons
@@ -3032,8 +3031,6 @@
     // Utility Icons
     lightbulb: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
     hand: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>',
-    home: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
-    utensils: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
     paintbrush: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.622 17.897-10.68-2.913"/><path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/><path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15"/></svg>',
     square: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>'
   };
@@ -3045,28 +3042,6 @@
   }
 
   // =============================================================================
-
-  // Plain English translations for infractions (using SVG icons)
-  function translateInfraction(text) {
-    const t = text.toLowerCase();
-    if (t.includes('handwash') && t.includes('soap')) return { icon: getIcon('droplet'), text: 'No soap at handwashing station' };
-    if (t.includes('handwash') && t.includes('paper')) return { icon: getIcon('scroll'), text: 'No paper towels at handwashing station' };
-    if (t.includes('handwash')) return { icon: getIcon('hand'), text: 'Handwashing station issue' };
-    if (t.includes('pest') || t.includes('vermin')) return { icon: getIcon('bug'), text: 'Gaps allowing pest entry' };
-    if (t.includes('rodent')) return { icon: getIcon('bug'), text: 'Evidence of rodents' };
-    if (t.includes('temperature') && t.includes('cold')) return { icon: getIcon('snowflake'), text: 'Food not kept cold enough' };
-    if (t.includes('temperature') && t.includes('hot')) return { icon: getIcon('flame'), text: 'Food not kept hot enough' };
-    if (t.includes('thermometer')) return { icon: getIcon('thermometer'), text: 'Missing thermometer in fridge/freezer' };
-    if (t.includes('sanitiz') || t.includes('sanitis')) return { icon: getIcon('sparkles'), text: 'Equipment not properly sanitized' };
-    if (t.includes('clean') && t.includes('floor')) return { icon: getIcon('paintbrush'), text: 'Floors not clean' };
-    if (t.includes('clean') && t.includes('wall')) return { icon: getIcon('square'), text: 'Walls not clean' };
-    if (t.includes('food handler') || t.includes('certification')) return { icon: getIcon('clipboard'), text: 'Staff certification issue' };
-    if (t.includes('utensil') && t.includes('clean')) return { icon: getIcon('utensils'), text: 'Utensils not cleanable' };
-    if (t.includes('chemical') && t.includes('rinse')) return { icon: getIcon('droplets'), text: 'Dishwasher not sanitizing properly' };
-    if (t.includes('contamination')) return { icon: getIcon('alertTriangle'), text: 'Food contamination risk' };
-    if (t.includes('sanitary condition')) return { icon: getIcon('home'), text: 'Food area not sanitary' };
-    return { icon: getIcon('fileText'), text: 'Health code violation' };
-  }
 
   async function searchRestaurants(query) {
     if (query.length < 2) {
