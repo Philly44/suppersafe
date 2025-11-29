@@ -189,6 +189,10 @@
       }
     }
 
+    .hero-content {
+      min-width: 0;
+    }
+
     .hero h1 {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 500;
@@ -2532,7 +2536,7 @@
     <div class="hero-content">
       <h1 id="heroHeadline"></h1>
 
-      <p class="hero-sub stat-line" id="heroStatLine"><span class="stat-badge" id="violationCount">0</span> failed since <span id="thirtyDaysAgo"></span>. Some are your favorites.</p>
+      <p class="hero-sub stat-line" id="heroStatLine"><span class="stat-badge" id="violationCount">0</span> failed in the last 30 days. Some are your favorites.</p>
 
       <div class="restaurant-search">
         <label for="restaurantSearch" class="search-main-label">Is your regular spot clean?</label>
@@ -2948,6 +2952,62 @@
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ===========================================
+  // ERROR ALERTING SYSTEM
+  // ===========================================
+
+  const errorAlert = {
+    lastErrors: new Map(),
+    THROTTLE_MS: 60000, // Don't send same error more than once per minute
+
+    send: async function(error, context = '') {
+      try {
+        // Throttle duplicate errors
+        const errorKey = `${error.message || ''}-${context}`;
+        const lastSent = this.lastErrors.get(errorKey);
+        if (lastSent && Date.now() - lastSent < this.THROTTLE_MS) {
+          return; // Skip duplicate
+        }
+        this.lastErrors.set(errorKey, Date.now());
+
+        await fetch(`${SUPABASE_URL}/functions/v1/error-alert`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: {
+              type: error.name || 'Error',
+              message: error.message || String(error),
+              stack: error.stack || null
+            },
+            context: context,
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+          })
+        });
+      } catch (e) {
+        // Silently fail - don't cause more errors
+        console.warn('Failed to send error alert:', e);
+      }
+    }
+  };
+
+  // Global error handler
+  window.onerror = function(message, source, lineno, colno, error) {
+    errorAlert.send(
+      error || { message, stack: `at ${source}:${lineno}:${colno}` },
+      'window.onerror'
+    );
+  };
+
+  // Unhandled promise rejections
+  window.onunhandledrejection = function(event) {
+    errorAlert.send(
+      event.reason || { message: 'Unhandled Promise Rejection' },
+      'unhandledrejection'
+    );
+  };
+
+  // ===========================================
   // HEADLINE A/B TESTING SYSTEM
   // ===========================================
 
@@ -3032,7 +3092,7 @@
         return uniqueEstablishments.size;
       } catch (e) {
         console.warn('Failed to get violation count:', e);
-        return 47; // Fallback count
+        return null; // Will show "Many" as fallback
       }
     },
 
@@ -3056,6 +3116,12 @@
       requestAnimationFrame(() => {
         statLine.classList.add('visible');
       });
+
+      // Handle fallback case
+      if (count === null) {
+        countEl.textContent = 'Many';
+        return;
+      }
 
       // Count up animation
       const duration = 1500;
@@ -3086,13 +3152,7 @@
 
   // Set live dates
   const today = new Date();
-  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
   const dateFormat = { month: 'short', day: 'numeric' };
-
-  const thirtyDaysAgoEl = document.getElementById('thirtyDaysAgo');
-  if (thirtyDaysAgoEl) {
-    thirtyDaysAgoEl.textContent = thirtyDaysAgo.toLocaleDateString('en-US', dateFormat);
-  }
 
   const lastUpdatedEl = document.getElementById('lastUpdated');
   if (lastUpdatedEl) {
