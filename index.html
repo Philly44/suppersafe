@@ -3,15 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Suppersafe - Restaurant Health Alerts for Toronto</title>
-  <meta name="description" content="Real-time restaurant health inspection alerts for Toronto. Know about violations before you eat there.">
-  <meta property="og:title" content="Suppersafe - Know Before You Eat">
-  <meta property="og:description" content="That restaurant has health violations. You just don't know it yet.">
+  <title>SupperSafe - Restaurant Health Alerts for Toronto</title>
+
+  <!-- Primary Meta -->
+  <meta name="description" content="Check any Toronto restaurant's health inspection record. See violations, safety scores, and get alerts. Free before launch.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="Your favorite restaurant failed inspection.">
+  <meta property="og:description" content="47 Toronto restaurants got critical violations last month. Look up yours before you eat there.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://suppersafe.com">
+  <meta property="og:image" content="https://suppersafe.com/og-image.png">
+
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Your favorite restaurant failed inspection.">
+  <meta name="twitter:description" content="47 Toronto restaurants got critical violations last month. Look up yours before you eat there.">
+  <meta name="twitter:image" content="https://suppersafe.com/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
@@ -175,54 +186,6 @@
       }
     }
 
-    .hero-secondary {
-      display: none;
-    }
-
-    .desktop-only {
-      display: block;
-    }
-
-    @media (max-width: 1000px) {
-      .desktop-only {
-        display: none !important;
-      }
-
-      .hero-secondary {
-        display: block;
-      }
-    }
-
-    .hero-eyebrow {
-      font-size: 14px;
-      color: #6B665C;
-      margin-bottom: 20px;
-      font-family: 'Space Grotesk', sans-serif;
-      letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .eyebrow-icon {
-      width: 18px;
-      height: 18px;
-      background: #DC2626;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .eyebrow-icon::before {
-      content: '!';
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-
     .hero h1 {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 500;
@@ -241,29 +204,6 @@
       margin-bottom: 24px;
     }
 
-    .headline-date {
-      display: block;
-      width: 100%;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      color: #6B665C;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 16px;
-      text-align: left;
-    }
-
-    #heroHeadline span:not(.headline-date):not(.headline-second) {
-      color: #2D5A3D;
-    }
-
-    #heroHeadline .headline-second {
-      color: #1a1a1a;
-      display: block;
-      margin-top: 8px;
-    }
-
     @media (max-width: 600px) {
       #heroHeadline {
         font-size: 28px;
@@ -276,25 +216,15 @@
         font-size: 30px;
         margin-bottom: 20px;
       }
-      
-      .hero-eyebrow {
-        font-size: 13px;
-        margin-bottom: 16px;
-      }
-      
-      .hero-lead {
-        font-size: 17px !important;
-        margin-bottom: 16px !important;
-      }
-      
+
       .hero-sub {
         font-size: 15px !important;
       }
-      
+
       nav {
         padding: 16px 20px;
       }
-      
+
       .tag {
         font-size: 10px;
         padding: 5px 8px;
@@ -326,18 +256,31 @@
       100% { transform: scaleX(1); }
     }
 
-    .hero-lead {
-      font-size: 19px;
-      color: #4A4640;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
     .hero-sub {
       font-size: 16px;
       color: #6B665C;
       line-height: 1.7;
       margin-bottom: 32px;
+    }
+
+    .stat-line {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 400ms ease-out, transform 400ms ease-out;
+    }
+
+    .stat-line.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stat-badge {
+      display: inline-block;
+      background: rgba(180, 90, 60, 0.12);
+      color: #B45A3C;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-weight: 600;
     }
 
     /* Search Box - Compact */
@@ -414,18 +357,66 @@
       line-height: 1.4;
     }
 
-    .search-free-badge {
-      display: inline-block;
+    .value-bridge {
+      font-size: 1.05rem;
+      color: #6B665C;
+      margin-top: 28px;
+      line-height: 1.6;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
+    }
+
+    .alert-preview {
+      color: #2C2925;
+      font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      .value-bridge {
+        font-size: 0.95rem;
+        margin-top: 20px;
+      }
+    }
+
+    /* Inspection Ticker */
+    .inspection-ticker {
+      margin-top: 16px;
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 32px;
+      animation: ticker-scroll 30s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      font-size: 13px;
+      color: #6B665C;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .ticker-item .pass {
       color: #2D5A3D;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-top: 12px;
-      padding: 4px 10px;
-      background: rgba(45, 90, 61, 0.08);
-      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .ticker-item .fail {
+      color: #B45A3C;
+      font-weight: 500;
+    }
+
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @media (max-width: 600px) {
+      .ticker-item {
+        font-size: 12px;
+      }
     }
 
     .search-results {
@@ -492,45 +483,6 @@
       font-family: 'Space Grotesk', sans-serif;
     }
 
-    /* Steps - Below Search */
-    .steps-inline {
-      display: flex;
-      gap: 24px;
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid #E8E4DD;
-    }
-
-    @media (max-width: 600px) {
-      .steps-inline {
-        flex-direction: column;
-        gap: 12px;
-      }
-    }
-
-    .step-inline {
-      flex: 1;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .step-num-inline {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px;
-      color: #2D5A3D;
-      font-weight: 600;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .step-text-inline {
-      font-size: 13px;
-      color: #6B665C;
-      font-family: 'Space Grotesk', sans-serif;
-      line-height: 1.4;
-    }
-
     /* Signup Card */
     .signup-card {
       background: white;
@@ -555,10 +507,6 @@
       .hero-content {
         order: 1;
       }
-
-      .hero-secondary {
-        order: 3;
-      }
     }
     
     @media (max-width: 600px) {
@@ -579,16 +527,6 @@
         padding: 16px 24px;
         font-size: 16px;
         min-height: 52px; /* Touch target */
-      }
-
-      .stats-row {
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
-      }
-
-      .stats-row > div {
-        text-align: center !important;
       }
 
       /* Mobile countdown */
@@ -630,17 +568,13 @@
       }
 
       .referral-share-btns .share-btn {
-        width: 48px;
-        height: 48px;
-        min-height: 48px; /* Touch target */
+        min-height: 44px; /* Touch target */
+        padding: 10px 8px;
+        font-size: 12px;
       }
 
-      .queue-position {
-        padding: 12px 14px;
-      }
-
-      .queue-number {
-        font-size: 20px;
+      .queue-status {
+        font-size: 13px;
       }
     }
 
@@ -766,6 +700,14 @@
       padding-top: 2px;
     }
 
+    .countdown-support {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
     /* Live counter animation */
     .live-counter {
       display: inline-flex;
@@ -815,62 +757,76 @@
       font-weight: 700;
     }
 
-    .price-crossed {
-      text-decoration: line-through;
-      color: #A09A8F;
-      font-size: 14px;
-    }
-
     /* Referral Section */
     .referral-section {
       margin-top: 20px;
     }
 
-    .queue-position {
+    .queue-status {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2D5A3D 100%);
-      border-radius: 8px;
-      padding: 14px 16px;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .queue-position-text {
+      font-weight: 600;
+    }
+
+    .queue-separator {
+      color: #A09A8F;
+    }
+
+    .queue-total {
+      color: #6B665C;
+    }
+
+    .spots-progress {
+      margin: 16px 0;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e5e5e5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #2D5A3D;
+      transition: width 0.3s ease;
+    }
+
+    .spots-remaining {
+      display: block;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+      margin-top: 6px;
+    }
+
+    .referral-hook {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #4A4640;
+      text-align: center;
       margin-bottom: 16px;
     }
 
-    .queue-label {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      color: rgba(255,255,255,0.7);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .queue-number {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .referral-box {
+    .referral-share {
       background: #FAF9F7;
       border: 1px solid #E8E4DD;
       border-radius: 10px;
       padding: 16px;
-      text-align: center;
     }
 
-    .referral-cta {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      color: #4A4640;
-      margin-bottom: 12px;
-    }
-
-    .referral-cta strong {
-      color: #F97316;
-    }
-
-    .referral-code-wrapper {
+    .referral-code-row {
       display: flex;
       gap: 8px;
       margin-bottom: 12px;
@@ -880,13 +836,11 @@
       flex: 1;
       padding: 10px 12px;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+      font-size: 13px;
+      font-weight: 500;
       background: white;
       border: 1.5px solid #D4D0C8;
       border-radius: 6px;
-      text-align: center;
       color: #1a1a1a;
     }
 
@@ -915,55 +869,100 @@
       display: flex;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 12px;
     }
 
     .referral-share-btns .share-btn {
-      flex: none;
-      width: 44px;
-      padding: 10px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
     }
 
-    .referral-nudge {
+    .referral-share-btns .share-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .referral-tracker {
+      text-align: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E8E4DD;
+    }
+
+    .referral-count-text {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px;
-      color: #2D5A3D;
-      font-weight: 500;
+      color: #6B665C;
     }
 
-    .referral-stats {
+    .referral-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .referral-dots .dot {
+      font-size: 18px;
+      color: #ccc;
+    }
+
+    .referral-dots .dot.filled {
+      color: #2D5A3D;
+    }
+
+    .referral-dots .arrow {
+      color: #A09A8F;
+      font-size: 14px;
+    }
+
+    .referral-dots .reward {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 12px;
       color: #6B665C;
     }
 
-    .referral-stats span {
-      font-weight: 600;
-      color: #2D5A3D;
+    /* Referral Success State */
+    .referral-success-state {
+      text-align: center;
     }
 
-    .waitlist-link {
-      display: block;
-      text-align: center;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #E8E4DD;
+    .referral-success-state .success-badge {
+      display: inline-block;
+      background: #2D5A3D;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 14px;
-      color: #2D5A3D;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
 
-    .waitlist-link:hover {
-      color: #F97316;
+    .referral-success-state .success-message {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      margin-bottom: 4px;
     }
 
-    .bookmark-hint {
-      text-align: center;
-      font-size: 12px;
-      color: #A09A8F;
-      margin-top: 8px;
+    .referral-success-state .success-cta {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: #6B665C;
+      margin-bottom: 16px;
+    }
+
+    .referral-success-state .referral-share-btns {
+      background: #FAF9F7;
+      border: 1px solid #E8E4DD;
+      border-radius: 10px;
+      padding: 16px;
     }
 
     .btn-primary:active {
@@ -973,39 +972,6 @@
     .btn-primary:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-    }
-
-    .signup-fine {
-      font-size: 12px;
-      color: #A09A8F;
-      margin-top: 14px;
-      text-align: center;
-    }
-
-    .divider {
-      width: 40px;
-      height: 1px;
-      background: #D4D0C8;
-      margin: 20px auto;
-    }
-
-    .stats-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      color: #6B665C;
-    }
-
-    .stat-value {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px;
-      color: #1a1a1a;
-      margin-bottom: 2px;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: #A09A8F;
     }
 
     /* Error message */
@@ -1308,12 +1274,158 @@
     .severity-dot.significant { background: #D97706; }
     .severity-dot.minor { background: #9CA3AF; }
 
-    .severity-legend {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 10px;
-      color: #9CA3AF;
-      margin-top: 8px;
+    /* Score Context - Prominent Percentile */
+    .score-context {
+      margin-top: 12px;
       text-align: center;
+    }
+
+    .score-context .percentile {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      color: #4A4640;
+      display: block;
+    }
+
+    .score-context .percentile strong {
+      color: #2D5A3D;
+    }
+
+    /* Scary Callout */
+    .scary-callout {
+      background: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .callout-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .callout-content {
+      flex: 1;
+    }
+
+    .callout-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #991B1B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .callout-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-style: italic;
+      font-size: 14px;
+      margin: 8px 0;
+      color: #1a1a1a;
+      line-height: 1.4;
+    }
+
+    .callout-date {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+    }
+
+    /* Timeline Insight */
+    .timeline-insight {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      padding: 12px 16px;
+      background: #F9FAFB;
+      border-radius: 6px;
+      margin: 12px 0;
+      color: #4A4640;
+    }
+
+    .timeline-insight.positive {
+      background: #ECFDF5;
+      color: #065F46;
+    }
+
+    .timeline-insight.negative {
+      background: #FEF2F2;
+      color: #991B1B;
+    }
+
+    /* Next Inspection */
+    .next-inspection {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #FAF9F7;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+    }
+
+    .next-label {
+      color: #6B665C;
+    }
+
+    .next-date {
+      font-weight: 600;
+      color: #2D5A3D;
+    }
+
+    /* Report Email Capture */
+    .report-email-capture {
+      margin-top: 20px;
+    }
+
+    .capture-divider {
+      height: 1px;
+      background: #E8E4DD;
+      margin-bottom: 20px;
+    }
+
+    .capture-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .capture-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .capture-email {
+      flex: 1;
+      padding: 12px 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      border: 1.5px solid #D4D0C8;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .capture-email:focus {
+      outline: none;
+      border-color: #2D5A3D;
+    }
+
+    .capture-form .btn-primary {
+      white-space: nowrap;
+    }
+
+    .capture-fine {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      color: #6B665C;
+      margin-top: 8px;
     }
 
     /* What they found */
@@ -1421,39 +1533,6 @@
       border-radius: 2px;
     }
 
-    .history-insight {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      color: #4A4640;
-      line-height: 1.5;
-      background: #FEF3C7;
-      padding: 10px 12px;
-      border-radius: 6px;
-      border-left: 3px solid #F59E0B;
-    }
-
-    .history-insight strong {
-      color: #92400E;
-    }
-
-    .history-insight.positive {
-      background: #ECFDF5;
-      border-left-color: #10B981;
-    }
-
-    .history-insight.positive strong {
-      color: #065F46;
-    }
-
-    .history-insight.neutral {
-      background: #F5F4F2;
-      border-left-color: #9CA3AF;
-    }
-
-    .history-insight.neutral strong {
-      color: #4B5563;
-    }
-
     /* Share section */
     .share-section {
       display: flex;
@@ -1519,7 +1598,7 @@
     /* Footer */
     .report-footer {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       margin-top: 16px;
       padding-top: 16px;
@@ -1555,23 +1634,6 @@
       color: #A09A8F;
     }
 
-    .report-close {
-      background: none;
-      border: none;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      color: #6B665C;
-      cursor: pointer;
-      padding: 8px 12px;
-      margin: -8px -12px;
-      border-radius: 4px;
-      transition: background 0.15s ease;
-    }
-
-    .report-close:hover {
-      background: #F5F4F2;
-      color: #1a1a1a;
-    }
 
     .data-source {
       font-family: 'Space Grotesk', sans-serif;
@@ -1951,30 +2013,6 @@
       margin-bottom: 16px;
     }
 
-    .share-header {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: #1a1a1a;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .share-header svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-
-    .share-subtext {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      color: #6B665C;
-      margin-bottom: 12px;
-    }
-
     .share-buttons-row {
       display: flex;
       gap: 8px;
@@ -2030,6 +2068,7 @@
       max-width: 400px;
       width: 100%;
       animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
 
     .gate-emoji {
@@ -2091,96 +2130,21 @@
       color: #1a1a1a;
     }
 
-    /* Holiday Theme Styles */
-    .gate-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #DC2626, #B91C1C);
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-    }
-
-    .gate-benefits {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 20px 0;
-      text-align: left;
-    }
-
-    .gate-benefits li {
-      font-size: 14px;
-      color: #1a1a1a;
-      padding: 8px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .gate-benefits li:last-child {
-      border-bottom: none;
-    }
-
-    .gate-price {
-      margin: 20px 0;
-      padding: 16px;
-      background: #FEF3C7;
-      border-radius: 12px;
-    }
-
-    .gate-price .price-crossed {
-      color: #9CA3AF;
-      text-decoration: line-through;
-      font-size: 16px;
-      margin-right: 8px;
-    }
-
-    .gate-price .price-holiday {
-      color: #059669;
+    .gate-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
       font-size: 24px;
-      font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-
-    .gate-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .gate-buttons .btn-primary {
-      padding: 14px 24px;
-      font-size: 15px;
-    }
-
-    .gate-buttons .btn-secondary {
-      background: white;
-      border: 2px solid #2D5A3D;
-      color: #2D5A3D;
-      padding: 12px 24px;
-      font-size: 14px;
-      border-radius: 8px;
+      color: #A09A8F;
       cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      transition: all 0.2s ease;
+      padding: 4px 8px;
+      line-height: 1;
     }
 
-    .gate-buttons .btn-secondary:hover {
-      background: #2D5A3D;
-      color: white;
-    }
-
-    .gate-deadline {
-      font-size: 13px;
-      color: #6B665C;
-      margin-bottom: 12px;
-    }
-
-    .gate-deadline span {
-      color: #2D5A3D;
-      font-weight: 600;
+    .gate-close:hover {
+      color: #1a1a1a;
     }
 
     /* Features section */
@@ -2352,7 +2316,7 @@
     
     @media (max-width: 600px) {
       .final-cta {
-        padding: 50px 20px 120px;
+        padding: 50px 20px;
       }
       
       .final-cta h2 {
@@ -2418,6 +2382,15 @@
 
     .final-cta-form.hidden {
       display: none;
+    }
+
+    .cta-value-line {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: #6B665C;
+      margin-top: 12px;
+      width: 100%;
+      text-align: center;
     }
 
     /* Footer */
@@ -2508,84 +2481,6 @@
       }
     }
 
-    /* Sticky Mobile CTA */
-    .sticky-cta {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .sticky-cta.visible {
-      transform: translateY(0);
-    }
-
-    .sticky-cta.hidden-complete {
-      display: none !important;
-    }
-
-    .sticky-cta.search-active-hide {
-      transform: translateY(100%);
-    }
-
-    .sticky-cta-inner {
-      display: flex;
-      gap: 10px;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    .sticky-cta .auth-input {
-      flex: 1;
-      padding: 12px 14px;
-      font-size: 16px;
-      margin-bottom: 0;
-      min-width: 0;
-    }
-
-    .sticky-cta .btn-primary {
-      padding: 12px 18px;
-      font-size: 14px;
-      white-space: nowrap;
-      width: auto;
-    }
-
-    .sticky-cta-count {
-      font-size: 11px;
-      color: #6B665C;
-      text-align: center;
-      margin-top: 8px;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-
-    .sticky-cta-count span {
-      font-weight: 600;
-      color: #2D5A3D;
-    }
-
-    @media (max-width: 1000px) {
-      .sticky-cta {
-        display: block;
-      }
-    }
-
-    @media (max-width: 400px) {
-      .sticky-cta-inner {
-        flex-direction: column;
-      }
-
-      .sticky-cta .btn-primary {
-        width: 100%;
-      }
-    }
-
     /* Toast */
     .toast {
       position: fixed;
@@ -2629,45 +2524,33 @@
 
   <main class="hero">
     <div class="hero-content">
-      <p class="hero-eyebrow"><span class="eyebrow-icon"></span>4 million Canadians get food poisoning every year.</p>
-      
-      <h1 id="heroHeadline">Loading...</h1>
-      
-      <p class="hero-lead">Instant alerts when a Toronto restaurant fails a health inspection. Free if you sign up before launch.</p>
-      
-      <p class="hero-sub">Last month, 47 Toronto restaurants got critical violations. Some of them are places you eat at.</p>
+      <h1 id="heroHeadline"></h1>
+
+      <p class="hero-sub stat-line" id="heroStatLine"><span class="stat-badge" id="violationCount">0</span> failed since <span id="thirtyDaysAgo"></span>. Some are your favorites.</p>
 
       <div class="restaurant-search">
-        <label for="restaurantSearch" class="search-main-label">Search 17,000+ Toronto restaurants</label>
+        <label for="restaurantSearch" class="search-main-label">Is your regular spot clean?</label>
         <div class="search-input-wrapper">
-          <input type="text" class="search-input" id="restaurantSearch" placeholder="e.g., Pai Northern Thai Kitchen" autocomplete="off">
+          <input type="text" class="search-input" id="restaurantSearch" placeholder="Restaurant name..." autocomplete="off">
           <div class="search-results" id="searchResults"></div>
         </div>
-        <p class="search-source">Data from Toronto Public Health. Updated within hours of new inspections.</p>
-        <p class="search-free-badge">Try it free</p>
-        
-        <div class="steps-inline desktop-only">
-          <div class="step-inline">
-            <span class="step-num-inline">01</span>
-            <span class="step-text-inline">Search your spots</span>
-          </div>
-          <div class="step-inline">
-            <span class="step-num-inline">02</span>
-            <span class="step-text-inline">See their record</span>
-          </div>
-          <div class="step-inline">
-            <span class="step-num-inline">03</span>
-            <span class="step-text-inline">Get alerts</span>
-          </div>
+        <p class="search-source">Data from Toronto Public Health · Updated <span id="lastUpdated"></span></p>
+        <div class="inspection-ticker">
+          <div class="ticker-track" id="tickerTrack"></div>
         </div>
       </div>
+
+      <p class="value-bridge">
+        Your phone buzzes: <span class="alert-preview">"Your saved spot just failed inspection."</span><br>
+        You were about to eat there tonight.
+      </p>
     </div>
 
     <div class="signup-card">
       <div class="form-state" id="formState">
         <!-- Countdown Timer -->
         <div class="countdown-wrapper">
-          <div class="countdown-label">Free access ends in</div>
+          <div class="countdown-label">Launching in</div>
           <div class="countdown-timer">
             <div class="countdown-unit">
               <div class="countdown-value" id="countdownDays">00</div>
@@ -2689,13 +2572,12 @@
               <div class="countdown-unit-label">Sec</div>
             </div>
           </div>
+          <div class="countdown-support">Sign up now - free access at launch</div>
         </div>
 
-        <h2 class="display">Get Early Access</h2>
-        <p class="signup-desc">
-          Sign up before launch and get free access when we go live.
-          <br><span class="live-counter"><span class="live-dot"></span> <strong class="counter-value" id="waitlistCount">247</strong> people already signed up</span>
-        </p>
+        <h2 class="display">Get Protected</h2>
+        <p class="signup-desc">We'll alert you when your spots fail. Free before launch.</p>
+        <p class="signup-desc live-counter"><span class="live-dot"></span> <strong class="counter-value" id="waitlistCount">247</strong> people already signed up</p>
 
         <div class="error-message" id="errorMessage"></div>
         <input type="email" class="auth-input" id="emailInput" placeholder="Your email" required>
@@ -2708,21 +2590,6 @@
           <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
           Continue with Google
         </button>
-
-        <p class="signup-fine">No spam. No ads. Unsubscribe anytime.</p>
-
-        <div class="divider"></div>
-
-        <div class="stats-row">
-          <div>
-            <div class="stat-value display">17,000+</div>
-            <div class="stat-label">restaurants tracked</div>
-          </div>
-          <div style="text-align: right;">
-            <div class="stat-value display">2 hrs</div>
-            <div class="stat-label">alert speed</div>
-          </div>
-        </div>
       </div>
 
       <div class="success-state" id="successState">
@@ -2733,53 +2600,81 @@
         <p id="successMessage">Check your email to confirm.</p>
 
         <div class="referral-section" id="referralSection">
-          <div class="queue-position">
-            <span class="queue-label">Your position</span>
-            <span class="queue-number" id="queuePosition">#248</span>
+          <!-- Progress state (shown by default) -->
+          <div class="referral-progress-state" id="referralProgressState">
+            <div class="queue-status">
+              <span class="queue-position-text">You're #<span id="userPosition">248</span></span>
+              <span class="queue-separator">·</span>
+              <span class="queue-total">1,000 free spots</span>
+            </div>
+
+            <div class="spots-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 24.8%"></div>
+              </div>
+              <span class="spots-remaining"><span id="spotsLeft">752</span> spots left</span>
+            </div>
+
+            <p class="referral-hook">Miss the top 1,000? Refer 2 friends to lock in free access.</p>
+
+            <div class="referral-share">
+              <div class="referral-code-row">
+                <input type="text" class="referral-code-input" id="referralCodeInput" value="suppersafe.com?ref=ABC123" readonly>
+                <button class="referral-copy-btn" id="copyReferralCode">Copy</button>
+              </div>
+
+              <div class="referral-share-btns">
+                <button class="share-btn twitter" id="referralTwitter">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  Twitter
+                </button>
+                <button class="share-btn whatsapp" id="referralWhatsapp">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  WhatsApp
+                </button>
+                <button class="share-btn copy" id="referralLink">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                  Copy Link
+                </button>
+              </div>
+            </div>
+
+            <div class="referral-tracker">
+              <span class="referral-count-text"><span id="referralCount">0</span> of 2 referrals</span>
+              <div class="referral-dots">
+                <span class="dot" id="dot1">○</span>
+                <span class="dot" id="dot2">○</span>
+                <span class="arrow">→</span>
+                <span class="reward">Free access locked</span>
+              </div>
+            </div>
           </div>
 
-          <div class="referral-box">
-            <p class="referral-cta">Share with friends. Help them get free access too.</p>
-            <div class="referral-code-wrapper">
-              <input type="text" class="referral-code-input" id="referralCodeInput" readonly value="SUPPER-XXXX">
-              <button class="referral-copy-btn" id="copyReferralCode">Copy</button>
-            </div>
+          <!-- Success state (shown when 2+ referrals) -->
+          <div class="referral-success-state" id="referralSuccessState" style="display: none;">
+            <div class="success-badge">✓ Free access locked</div>
+            <p class="success-message">You referred 2 friends. You're in free, guaranteed.</p>
+            <p class="success-cta">Keep sharing - help your friends get in too.</p>
+
             <div class="referral-share-btns">
-              <button class="share-btn twitter" id="referralTwitter">
+              <button class="share-btn twitter" id="referralTwitterSuccess">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Twitter
               </button>
-              <button class="share-btn whatsapp" id="referralWhatsapp">
+              <button class="share-btn whatsapp" id="referralWhatsappSuccess">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
               </button>
-              <button class="share-btn copy" id="referralLink">
+              <button class="share-btn copy" id="referralLinkSuccess">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                Copy Link
               </button>
             </div>
-            <p class="referral-nudge" id="referralNudge">Share your link to jump the line</p>
-            <p class="referral-stats" id="referralStats" style="display: none;"><span id="referralCount">0</span> friends joined · <span id="spotsJumped">0</span> spots jumped</p>
           </div>
-          <a href="waitlist.html" class="waitlist-link" id="waitlistDashboardLink">View full dashboard →</a>
-          <p class="bookmark-hint">Bookmark this link to check your spot anytime</p>
         </div>
       </div>
     </div>
 
-    <div class="hero-secondary">
-      <div class="steps-inline" style="border-top: none; padding-top: 0; margin-top: 0;">
-        <div class="step-inline">
-          <span class="step-num-inline">01</span>
-          <span class="step-text-inline">Search your regular spots</span>
-        </div>
-        <div class="step-inline">
-          <span class="step-num-inline">02</span>
-          <span class="step-text-inline">See their inspection record</span>
-        </div>
-        <div class="step-inline">
-          <span class="step-num-inline">03</span>
-          <span class="step-text-inline">Get alerts when things change</span>
-        </div>
-      </div>
-    </div>
   </main>
 </div>
 
@@ -2802,102 +2697,131 @@
     </div>
 
     <div class="report-content">
-      <div class="report-header">
-        <div class="report-name" id="reportName">Restaurant Name</div>
-        <div class="report-address" id="reportAddress">123 Street</div>
-      </div>
-
       <!-- Loading State (shown first) -->
       <div class="score-loading" id="scoreLoading">
         <div class="score-loading-icon"></div>
-        <div class="score-loading-text">Analyzing inspection records...</div>
+        <div class="score-loading-text" id="loadingText">Analyzing inspection records...</div>
       </div>
 
-      <!-- Safety Score Hero (revealed after loading) -->
-      <div class="safety-score-hero" id="safetyScoreHero" style="display: none;">
-        <div class="celebration-badge" id="celebrationBadge" style="display: none;">
-          Excellent Safety Record
-        </div>
-        <div class="warning-badge" id="warningBadge" style="display: none;">
-          Safety Concerns Found
+      <!-- ABOVE THE FOLD - Screenshot ready -->
+      <div class="report-above-fold" id="reportAboveFold" style="display: none;">
+        <div class="report-header">
+          <div class="report-name" id="reportName">Restaurant Name</div>
+          <div class="report-address" id="reportAddress">123 Street</div>
         </div>
 
-        <div class="score-circle-wrapper" id="scoreCircleWrapper">
-          <div class="score-circle-bg"></div>
-          <div class="score-circle-ring" id="scoreRing"></div>
-          <div class="score-circle-inner">
-            <div class="score-number-main" id="scoreNumber">0</div>
-            <div class="score-out-of">out of 100</div>
+        <!-- Safety Score Hero -->
+        <div class="safety-score-hero" id="safetyScoreHero">
+          <div class="celebration-badge" id="celebrationBadge" style="display: none;">
+            Excellent Safety Record
+          </div>
+          <div class="warning-badge" id="warningBadge" style="display: none;">
+            Safety Concerns Found
+          </div>
+
+          <div class="score-circle-wrapper" id="scoreCircleWrapper">
+            <div class="score-circle-bg"></div>
+            <div class="score-circle-ring" id="scoreRing"></div>
+            <div class="score-circle-inner">
+              <div class="score-number-main" id="scoreNumber">0</div>
+              <div class="score-out-of">out of 100</div>
+            </div>
+          </div>
+
+          <div class="score-label" id="scoreLabel">Calculating...</div>
+
+          <!-- Prominent Percentile Context -->
+          <div class="score-context" id="scoreContext">
+            <span class="percentile" id="scorePercentile">Comparing to Toronto restaurants...</span>
+          </div>
+
+          <div class="severity-breakdown" id="severityBreakdown" style="margin-top: 16px;">
+            <div class="severity-pill"><span class="severity-dot crucial"></span><span id="crucialCount">0</span> crucial</div>
+            <div class="severity-pill"><span class="severity-dot significant"></span><span id="significantCount">0</span> significant</div>
+            <div class="severity-pill"><span class="severity-dot minor"></span><span id="minorCount">0</span> minor</div>
           </div>
         </div>
 
-        <div class="score-label" id="scoreLabel">Calculating...</div>
-        <div class="score-percentile" id="scorePercentile">Comparing to Toronto restaurants...</div>
-
-        <div class="severity-breakdown" id="severityBreakdown" style="margin-top: 16px;">
-          <div class="severity-pill"><span class="severity-dot crucial"></span><span id="crucialCount">0</span> crucial</div>
-          <div class="severity-pill"><span class="severity-dot significant"></span><span id="significantCount">0</span> significant</div>
-          <div class="severity-pill"><span class="severity-dot minor"></span><span id="minorCount">0</span> minor</div>
-        </div>
-        <p class="severity-legend">Crucial = immediate health risk • Significant = potential risk • Minor = administrative</p>
-      </div>
-
-      <div class="findings-section" id="findingsSection" style="display: none;">
-        <div class="findings-label">What inspectors found</div>
-        <div id="findingsList">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <div class="history-section" id="historySection" style="display: none;">
-        <div class="history-header">
-          <span class="history-label">Inspection History</span>
-          <span class="history-count" id="historyCount">6 visits since 2022</span>
-        </div>
-        <div class="trend-bars" id="trendBars"></div>
-        <div class="history-insight" id="historyInsight">
-          <strong>7x more infractions</strong> than their previous average.
+        <!-- Share Section (visible above fold) -->
+        <div class="share-section-enhanced" id="shareSection" style="display: none;">
+          <div class="share-buttons-row">
+            <button class="share-btn twitter" id="shareTwitter">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Share
+            </button>
+            <button class="share-btn whatsapp" id="shareWhatsapp">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Send
+            </button>
+            <button class="share-btn copy" id="shareCopy">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Copy
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Enhanced Share Section -->
-      <div class="share-section-enhanced" id="shareSection" style="display: none;">
-        <div class="share-header" id="shareHeader">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-          Share this report
+      <!-- BELOW THE FOLD - Deep details -->
+      <div class="report-details" id="reportDetails" style="display: none;">
+        <!-- Scary Callout (only for violations) -->
+        <div class="scary-callout" id="scaryCallout" style="display: none;">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-content">
+            <span class="callout-label">Most Recent Finding</span>
+            <p class="callout-text" id="calloutText"></p>
+            <span class="callout-date" id="calloutDate"></span>
+          </div>
         </div>
-        <div class="share-subtext" id="shareSubtext">Let friends know about this restaurant</div>
-        <div class="share-buttons-row">
-          <button class="share-btn twitter" id="shareTwitter">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            Share
-          </button>
-          <button class="share-btn whatsapp" id="shareWhatsapp">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Send
-          </button>
-          <button class="share-btn copy" id="shareCopy">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            Copy
-          </button>
+
+        <!-- Timeline Insight -->
+        <p class="timeline-insight" id="timelineInsight" style="display: none;"></p>
+
+        <div class="findings-section" id="findingsSection" style="display: none;">
+          <div class="findings-label">What inspectors found</div>
+          <div id="findingsList"></div>
         </div>
+
+        <div class="history-section" id="historySection" style="display: none;">
+          <div class="history-header">
+            <span class="history-label">Inspection History</span>
+            <span class="history-count" id="historyCount">6 visits since 2022</span>
+          </div>
+          <div class="trend-bars" id="trendBars"></div>
+        </div>
+
+        <!-- Next Inspection Expected -->
+        <div class="next-inspection" id="nextInspection" style="display: none;">
+          <span class="next-label">Next inspection expected:</span>
+          <span class="next-date" id="nextDate"></span>
+        </div>
+
+        <!-- Email Capture (signed-out users only) -->
+        <div class="report-email-capture" id="reportEmailCapture" style="display: none;">
+          <div class="capture-divider"></div>
+          <h4 class="capture-title">Get alerts when this changes</h4>
+          <form class="capture-form" id="captureForm">
+            <input type="email" class="capture-email" id="captureEmail" placeholder="Your email" required>
+            <input type="text" name="website" class="hp-field" id="hpCapture" tabindex="-1" autocomplete="off">
+            <button type="submit" class="btn-primary">Get Early Access</button>
+          </form>
+          <p class="capture-fine">Free for everyone who joins before launch</p>
+        </div>
+
+        <!-- CTA Button (adapts based on signup status) -->
+        <button class="report-cta" id="reportCta" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span id="ctaText">Sign up to get alerts like this</span>
+        </button>
+
+        <div class="report-footer" id="reportFooter" style="display: none;">
+          <div class="report-brand">
+            <div class="report-brand-mark"><div class="report-brand-mark-inner"></div></div>
+            <span class="report-brand-text">suppersafe.com</span>
+          </div>
+        </div>
+
+        <div class="data-source" id="dataSource" style="display: none;">Data from Toronto Public Health DineSafe</div>
       </div>
-
-      <!-- Personalized CTA -->
-      <button class="report-cta" id="reportCta" style="display: none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-        <span id="ctaText">Get alerts for this restaurant</span>
-      </button>
-
-      <div class="report-footer" id="reportFooter" style="display: none;">
-        <div class="report-brand">
-          <div class="report-brand-mark"><div class="report-brand-mark-inner"></div></div>
-          <span class="report-brand-text">suppersafe.com</span>
-        </div>
-        <button class="report-close" id="reportClose">Search another</button>
-      </div>
-
-      <div class="data-source" id="dataSource" style="display: none;">Data from Toronto Public Health DineSafe</div>
     </div>
   </div>
 </template>
@@ -2905,29 +2829,20 @@
 <!-- GATE MODAL TEMPLATE -->
 <template id="gateTemplate">
   <div class="gate-modal">
-    <div class="gate-badge">🎁 Holiday Special</div>
-    <h3 class="gate-title">Lifetime Access for $29</h3>
-    <p class="gate-subtitle">Pre-order now, full access starts January 2026</p>
+    <button class="gate-close" id="gateClose" aria-label="Close">&times;</button>
 
-    <ul class="gate-benefits">
-      <li>✓ Unlimited restaurant safety checks</li>
-      <li>✓ Real-time alerts when your spots get inspected</li>
-      <li>✓ Never pay again — lifetime access</li>
-    </ul>
+    <h3 class="gate-title">Want to see the full report?</h3>
+    <p class="gate-subtitle">Sign up to see health scores, violation history, and get alerts for this restaurant.</p>
 
-    <div class="gate-price">
-      <span class="price-crossed">$60/year</span>
-      <span class="price-holiday">$29 once, forever</span>
+    <div class="gate-form">
+      <input type="email" class="auth-input" id="gateEmailInput" placeholder="Your email" required>
+      <input type="text" name="company" class="hp-field" id="hpGate" tabindex="-1" autocomplete="off">
+      <button type="button" class="btn-primary" id="gateSubmit">Get Early Access</button>
     </div>
 
-    <div class="gate-buttons">
-      <button type="button" class="btn-primary" id="buyForSelf">Buy for Myself</button>
-      <button type="button" class="btn-secondary" id="buyAsGift">🎁 Gift to Someone</button>
-    </div>
+    <p class="gate-fine">Free for everyone who joins before launch</p>
 
-    <p class="gate-deadline">⏰ Holiday pricing ends Dec 31 · <span id="spotsClaimed">247</span> spots claimed</p>
-
-    <button class="gate-skip" id="gateSkip">Maybe later</button>
+    <button class="gate-skip" id="gateSkip">Skip for now</button>
   </div>
 </template>
 
@@ -2937,15 +2852,15 @@
     <div class="features-grid">
       <div class="feature">
         <h3>Know before you book</h3>
-        <p>When Toronto Public Health files an inspection, you know within hours. Not weeks later.</p>
+        <p>Alerts within hours of a new inspection.</p>
       </div>
       <div class="feature">
         <h3>Plain English</h3>
-        <p>We translate inspector jargon into what actually happened. Real words, real context.</p>
+        <p>No jargon. Just what actually happened.</p>
       </div>
       <div class="feature">
         <h3>Your restaurants only</h3>
-        <p>Save your regular spots. We only alert you about places you actually eat at.</p>
+        <p>Only alerts for places you actually eat.</p>
       </div>
     </div>
   </div>
@@ -2955,9 +2870,8 @@
   <div class="problem-inner">
     <h2 class="display">The city knows. Why don't you?</h2>
     <div class="problem-text">
-      <p>Toronto Public Health inspects restaurants constantly. They publish everything on DineSafe. It's all public.</p>
-      <p>But you'd have to check manually, search by name, scroll through dates, and decode what "M - Minor infraction: Operator fail to ensure necessary measures" means for your dinner plans.</p>
-      <p>Nobody does that. So that place with the pest problem? You found out the hard way.</p>
+      <p>Toronto Public Health inspects every restaurant and publishes the results. It's all public. But have you ever actually looked? The reports read like this: "M - Minor infraction: Operator fail to ensure necessary measures."</p>
+      <p>That place with the pest problem? The report existed. You just never saw it.</p>
     </div>
   </div>
 </section>
@@ -2965,47 +2879,40 @@
 <section class="faq">
   <div class="faq-inner">
     <h2 class="display">Questions</h2>
-    
+
     <div class="faq-item">
       <h3>Where does the data come from?</h3>
-      <p>Toronto Public Health's DineSafe program. Same source as the signs in restaurant windows. We just make it accessible.</p>
-    </div>
-    
-    <div class="faq-item">
-      <h3>Is this really free?</h3>
-      <p>Yes. Sign up before January 1, 2026 and you get free access when we launch. We'll figure out pricing for new users later - early supporters get in free.</p>
+      <p>Toronto Public Health's DineSafe program - the same source as the signs in restaurant windows.</p>
     </div>
 
     <div class="faq-item">
-      <h3>When do you launch?</h3>
-      <p>January 1, 2026 in Toronto. Everyone who signs up before then gets free access.</p>
+      <h3>Is this really free?</h3>
+      <p>Yes. Everyone who signs up before our January 1, 2026 launch gets free access.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>What counts as a violation?</h3>
+      <p>Toronto uses three levels: crucial (immediate health risk), significant (potential risk), and minor (administrative). We translate all of them into plain English.</p>
     </div>
   </div>
 </section>
 
 <section class="final-cta">
   <div class="final-cta-inner">
-    <h2 class="display">Stop eating in the dark</h2>
-    <p>Sign up before January 1, 2026 and get free access at launch.<br><span id="waitlistCountBottom">247</span> people already signed up.</p>
+    <h2 class="display">Now you know.</h2>
+    <p>Get alerts when your restaurants get inspected.</p>
 
     <div class="final-cta-form" id="finalForm">
       <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
       <input type="text" name="url" class="hp-field" id="hpFinal" tabindex="-1" autocomplete="off">
       <button type="button" class="btn-primary" id="finalSubmit">Get Early Access</button>
+      <p class="cta-value-line">Free for everyone who joins before launch</p>
     </div>
 
     <p class="final-success" id="finalSuccess">You're in! Check your email to confirm.</p>
   </div>
 </section>
 
-<div class="sticky-cta" id="stickyCta">
-  <div class="sticky-cta-inner">
-    <input type="email" class="auth-input" id="stickyEmailInput" placeholder="Your email">
-    <input type="text" name="fax" class="hp-field" id="hpSticky" tabindex="-1" autocomplete="off">
-    <button type="button" class="btn-primary" id="stickySubmit">Get Access</button>
-  </div>
-  <p class="sticky-cta-count"><span id="stickyCount">249</span> signed up · <strong class="founding-value">Free before Jan 1</strong></p>
-</div>
 
 <div class="toast" id="toast">Copied!</div>
 
@@ -3016,7 +2923,7 @@
       <span class="logo-text">suppersafe</span>
     </div>
     <div class="footer-center">
-      <span class="footer-promise">No ads. Ever.</span>
+      <span class="footer-promise">No ads. No data sales. Ever.</span>
       <span class="footer-divider">·</span>
       <a href="mailto:hello@suppersafe.com" class="footer-contact">hello@suppersafe.com</a>
       <span class="footer-divider">·</span>
@@ -3024,7 +2931,7 @@
       <span class="footer-divider">·</span>
       <a href="terms.html" class="footer-contact">Terms</a>
     </div>
-    <div class="footer-right">Toronto, 2026</div>
+    <div class="footer-right">© 2025 SupperSafe · Toronto</div>
   </div>
 </footer>
 
@@ -3039,49 +2946,50 @@
 
   const headlineTests = {
     headlines: [
-      { id: "pride_01", category: "pride", second: "You just haven't seen them yet." },
-      { id: "pride_02", category: "pride", second: "The reports exist. You've just never looked." },
-      { id: "pride_03", category: "pride", second: "Smart diners check first." },
-      { id: "pride_04", category: "pride", second: "You wouldn't book a hotel without reviews. Why eat blind?" },
-      { id: "fear_01", category: "fear", second: "You've eaten at places you've never checked." },
-      { id: "fear_02", category: "fear", second: "Some look spotless. The reports say otherwise." },
-      { id: "fear_03", category: "fear", second: "The kitchen you can't see has a paper trail." },
-      { id: "fear_04", category: "fear", second: "What you don't know might already be on your plate." },
-      { id: "curiosity_01", category: "curiosity", second: "Type in your favorite. See what comes up." },
-      { id: "curiosity_02", category: "curiosity", second: "One search. That's all it takes." },
-      { id: "curiosity_03", category: "curiosity", second: "Look up any spot. The truth is public." },
-      { id: "position_01", category: "positioning", second: "The data's public. Finding it isn't." }
+      { id: "v2_dirty", text: "You'd never eat somewhere dirty. Right?" },
+      { id: "v2_friends", text: "Your friends check restaurants. You don't." },
+      { id: "v2_kitchens", text: "Kitchens fail inspections. Nobody tells you." },
+      { id: "v2_busy", text: "Too busy to check? That's what they're counting on." },
+      { id: "v2_corners", text: "Restaurants cut corners. You pay the price." },
+      { id: "v2_3xweek", text: "You eat out 3x a week. How many passed inspection?" },
+      { id: "v2_favorite", text: "Your favorite restaurant failed inspection." }
     ],
 
     sessionId: null,
     currentHeadline: null,
 
-    init: async function() {
+    init: function() {
+      // Create/restore session ID
       this.sessionId = localStorage.getItem('suppersafe_headline_session');
       if (!this.sessionId) {
         this.sessionId = 'hs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('suppersafe_headline_session', this.sessionId);
       }
 
+      // Check if headline already selected in this session
       const existingHeadlineId = localStorage.getItem('suppersafe_current_headline');
       if (existingHeadlineId) {
         this.currentHeadline = this.headlines.find(h => h.id === existingHeadlineId);
       }
 
+      // If new session or headline not found, randomly select and log
       if (!this.currentHeadline) {
         this.currentHeadline = this.headlines[Math.floor(Math.random() * this.headlines.length)];
         localStorage.setItem('suppersafe_current_headline', this.currentHeadline.id);
-        await this.logImpression();
+        this.logImpression(); // Fire and forget (async, non-blocking)
       }
 
-      await this.displayHeadline();
+      // Display headline immediately (sync)
+      this.displayHeadline();
+
+      // Load violation count asynchronously and animate stat line
+      this.loadAndAnimateStatLine();
     },
 
     logImpression: async function() {
       try {
         await supabase.from('headline_tests').insert({
           headline_id: this.currentHeadline.id,
-          category: this.currentHeadline.category,
           session_id: this.sessionId
         });
       } catch (e) {
@@ -3117,44 +3025,108 @@
         return uniqueEstablishments.size;
       } catch (e) {
         console.warn('Failed to get violation count:', e);
-        return 847;
+        return 47; // Fallback count
       }
     },
 
-    formatDate: function() {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date().toLocaleDateString('en-US', options);
-    },
-
-    displayHeadline: async function() {
+    displayHeadline: function() {
       const heroEl = document.getElementById('heroHeadline');
       if (!heroEl) return;
 
-      let count = await this.getViolationCount();
+      // Display headline immediately (sync)
+      heroEl.textContent = this.currentHeadline.text;
+    },
 
-      if (!count || count < 10) {
-        try {
-          const { data } = await supabase
-            .from('dinesafe')
-            .select('establishment_id')
-            .ilike('severity', 'C%');
+    loadAndAnimateStatLine: async function() {
+      const statLine = document.getElementById('heroStatLine');
+      const countEl = document.getElementById('violationCount');
+      if (!statLine || !countEl) return;
 
-          if (data) {
-            const unique = new Set(data.map(d => d.establishment_id));
-            count = unique.size;
-          }
-        } catch (e) {
-          count = 847;
+      // Fetch violation count
+      const count = await this.getViolationCount();
+
+      // Trigger fade-in first
+      requestAnimationFrame(() => {
+        statLine.classList.add('visible');
+      });
+
+      // Count up animation
+      const duration = 1500;
+      const start = performance.now();
+
+      const animate = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Ease out cubic for satisfying slow-down
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(eased * count);
+
+        countEl.textContent = current.toLocaleString();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          countEl.textContent = count.toLocaleString();
         }
-      }
+      };
 
-      const dateStr = this.formatDate();
-
-      heroEl.innerHTML = `<span class="headline-date">Last 30 days · Updated ${dateStr}</span><span>${count.toLocaleString()}</span> Toronto restaurants flagged for violations. <span class="headline-second">${this.currentHeadline.second}</span>`;
+      requestAnimationFrame(animate);
     }
   };
 
   headlineTests.init();
+
+  // Set live dates
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const dateFormat = { month: 'short', day: 'numeric' };
+
+  const thirtyDaysAgoEl = document.getElementById('thirtyDaysAgo');
+  if (thirtyDaysAgoEl) {
+    thirtyDaysAgoEl.textContent = thirtyDaysAgo.toLocaleDateString('en-US', dateFormat);
+  }
+
+  const lastUpdatedEl = document.getElementById('lastUpdated');
+  if (lastUpdatedEl) {
+    lastUpdatedEl.textContent = today.toLocaleDateString('en-US', dateFormat);
+  }
+
+  // ===========================================
+  // INSPECTION TICKER
+  // ===========================================
+  async function initTicker() {
+    const track = document.getElementById('tickerTrack');
+    if (!track) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('dinesafe')
+        .select('establishment_name, inspection_date, status')
+        .order('inspection_date', { ascending: false })
+        .limit(20);
+
+      if (error || !data?.length) {
+        track.parentElement.style.display = 'none';
+        return;
+      }
+
+      const items = data.map(d => {
+        const date = new Date(d.inspection_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const passed = d.status === 'Pass';
+        const statusClass = passed ? 'pass' : 'fail';
+        const statusText = passed ? 'Pass' : 'Fail';
+        return `<span class="ticker-item">${d.establishment_name} · <span class="${statusClass}">${statusText}</span> · ${date}</span>`;
+      }).join('');
+
+      // Duplicate for seamless infinite scroll
+      track.innerHTML = items + items;
+    } catch (e) {
+      track.parentElement.style.display = 'none';
+    }
+  }
+
+  initTicker();
 
   // ===========================================
   // CONFIG - Centralized magic numbers
@@ -3162,8 +3134,8 @@
   const CONFIG = {
     INITIAL_WAITLIST_COUNT: 247,
     QUEUE_START_POSITION: 248,
-    FOUNDING_MEMBER_CAP: 500,
-    SPOTS_PER_REFERRAL: 10,
+    FREE_SPOTS_LIMIT: 1000,
+    REFERRALS_FOR_FREE: 2,
   };
 
   // State
@@ -3316,14 +3288,11 @@
   async function searchRestaurants(query) {
     if (query.length < 2) {
       searchResults.classList.remove('active');
-      stickyCta.classList.remove('search-active-hide');
       return;
     }
 
     searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
     searchResults.classList.add('active');
-    // Hide sticky CTA so it doesn't cover search results
-    stickyCta.classList.add('search-active-hide');
 
     try {
       const { data, error } = await supabase
@@ -3372,7 +3341,6 @@
   async function selectRestaurant(id, name, address) {
     headlineTests.logConversion('restaurant_search');
     searchResults.classList.remove('active');
-    stickyCta.classList.remove('search-active-hide');
     searchInput.value = '';
 
     // Check if gated
@@ -3390,77 +3358,39 @@
     const clone = template.content.cloneNode(true);
     modalContainer.innerHTML = '';
     modalContainer.appendChild(clone);
-    modalContainer.setAttribute('aria-label', 'Holiday Pre-Purchase Offer');
+    modalContainer.setAttribute('aria-label', 'Sign up for full access');
 
-    // Update spots claimed count
-    const spotsEl = document.getElementById('spotsClaimed');
-    if (spotsEl) {
-      spotsEl.textContent = document.getElementById('waitlistCount')?.textContent || CONFIG.INITIAL_WAITLIST_COUNT;
-    }
-
-    // Buy for self button
-    document.getElementById('buyForSelf').addEventListener('click', () => {
-      initiatePurchase('self');
+    // Close button
+    document.getElementById('gateClose').addEventListener('click', () => {
+      closeModal();
     });
 
-    // Gift to someone button
-    document.getElementById('buyAsGift').addEventListener('click', () => {
-      initiatePurchase('gift');
-    });
-
+    // Skip button
     document.getElementById('gateSkip').addEventListener('click', () => {
       closeModal();
     });
 
-    openModal();
-  }
-
-  // Initiate Stripe Checkout
-  async function initiatePurchase(type) {
-    const email = prompt('Enter your email address:');
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showToast('Please enter a valid email');
-      return;
-    }
-
-    let giftRecipientEmail = null;
-    if (type === 'gift') {
-      giftRecipientEmail = prompt('Enter the recipient\'s email address:');
-      if (!giftRecipientEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(giftRecipientEmail)) {
-        showToast('Please enter a valid recipient email');
+    // Email signup
+    document.getElementById('gateSubmit').addEventListener('click', () => {
+      if (isBot('hpGate')) { return; }
+      const email = document.getElementById('gateEmailInput').value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast('Please enter a valid email');
         return;
       }
-    }
+      document.getElementById('gateSubmit').disabled = true;
+      document.getElementById('gateSubmit').textContent = '...';
+      signUpWithEmail(email);
+    });
 
-    showToast('Redirecting to checkout...');
-
-    try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          email,
-          purchaseType: type,
-          giftRecipientEmail
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout');
+    // Enter key support
+    document.getElementById('gateEmailInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        document.getElementById('gateSubmit').click();
       }
+    });
 
-      // Redirect to Stripe Checkout
-      window.location.href = data.checkoutUrl;
-
-    } catch (error) {
-      console.error('Purchase error:', error);
-      showToast('Something went wrong. Please try again.');
-    }
+    openModal();
   }
 
   // ===========================================
@@ -3528,24 +3458,24 @@
       ],
       // Poor (60-69)
       poor: [
-        { weight: 2, template: (r) => `PSA: you can look up any Toronto restaurant's health inspection for free.\n\n${r.name}? ${r.score}/100 with ${r.total} violations.\n\nsuppersafe.com` },
-        { weight: 1, template: (r) => `That place you're going to might have health violations on file.\n\n${r.name}: ${r.score}/100, ${r.total} issues.\n\nsuppersafe.com` }
+        { weight: 2, template: (r) => `PSA: you can look up any Toronto restaurant's health inspection for free.\n\n${r.name}? ${r.score}/100 with ${r.total} violations.\n\nsuppersafe.com - Top 1,000 signups get free access.` },
+        { weight: 1, template: (r) => `That place you're going to might have health violations on file.\n\n${r.name}: ${r.score}/100, ${r.total} issues.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
       ],
       // Critical (<60)
       critical: [
-        { weight: 3, template: (r) => `Safety Alert: ${r.name} scored just ${r.score}/100 on their health inspection${r.crucial > 0 ? ` with ${r.crucial} critical violation${r.crucial !== 1 ? 's' : ''}` : ''}.\n\nCheck before you eat: suppersafe.com` },
-        { weight: 2, template: (r) => `Just looked up ${r.name} before booking. ${r.score}/100 on safety. ${r.total} violations.${r.topFinding ? `\n\nIncluding "${r.topFinding}."` : ''}\n\nsuppersafe.com` },
-        { weight: 2, template: (r) => `Friendly reminder that restaurant health inspections are public record.\n\n${r.name}: ${r.score}/100, ${r.total} violations.\n\nsuppersafe.com` }
+        { weight: 3, template: (r) => `Safety Alert: ${r.name} scored just ${r.score}/100 on their health inspection${r.crucial > 0 ? ` with ${r.crucial} critical violation${r.crucial !== 1 ? 's' : ''}` : ''}.\n\nCheck before you eat: suppersafe.com. Top 1,000 signups get free access.` },
+        { weight: 2, template: (r) => `Just looked up ${r.name} before booking. ${r.score}/100 on safety. ${r.total} violations.${r.topFinding ? `\n\nIncluding "${r.topFinding}."` : ''}\n\nsuppersafe.com - Top 1,000 signups get free access.` },
+        { weight: 2, template: (r) => `Friendly reminder that restaurant health inspections are public record.\n\n${r.name}: ${r.score}/100, ${r.total} violations.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
       ],
       // Pest-specific (overrides score tier when detected)
       pests: [
-        { weight: 4, template: (r) => `Looked up ${r.name} and... they found pest evidence on the last inspection.\n\nYou can check any Toronto restaurant: suppersafe.com` },
-        { weight: 2, template: (r) => `Maybe don't read this if you've eaten at ${r.name} recently.\n\nPest evidence on their last health inspection.\n\nsuppersafe.com` }
+        { weight: 4, template: (r) => `Looked up ${r.name} and... they found pest evidence on the last inspection.\n\nCheck any Toronto restaurant: suppersafe.com. Top 1,000 signups get free access.` },
+        { weight: 2, template: (r) => `Maybe don't read this if you've eaten at ${r.name} recently.\n\nPest evidence on their last health inspection.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
       ],
       // Conditional pass status
       conditionalPass: [
-        { weight: 3, template: (r) => `${r.name} is on "Conditional Pass" status with Toronto Public Health. ${r.score}/100.\n\nYou can look up any restaurant: suppersafe.com` },
-        { weight: 2, template: (r) => `TIL ${r.name} has a conditional pass from health inspectors. Might want to check your regular spots too.\n\nsuppersafe.com` }
+        { weight: 3, template: (r) => `${r.name} is on "Conditional Pass" status with Toronto Public Health. ${r.score}/100.\n\nLook up any restaurant: suppersafe.com. Top 1,000 signups get free access.` },
+        { weight: 2, template: (r) => `TIL ${r.name} has a conditional pass from health inspectors. Might want to check your regular spots too.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
       ]
     },
 
@@ -3561,19 +3491,19 @@
         { weight: 2, template: (r) => `looked up ${r.name}\n\n${r.score}/100, ${r.total} minor thing${r.total !== 1 ? 's' : ''} on their last inspection\n\nyou can check any restaurant: suppersafe.com` }
       ],
       poor: [
-        { weight: 2, template: (r) => `before you book that dinner reservation\n\nyou can look up any restaurant's health inspection record\n\n${r.name} is ${r.score}/100 with ${r.total} violations\n\nsuppersafe.com` },
-        { weight: 1, template: (r) => `not to be that person but\n\n${r.name} is ${r.score}/100 on health inspection\n\nyou can look up any toronto restaurant here: suppersafe.com` }
+        { weight: 2, template: (r) => `before you book that dinner reservation\n\nyou can look up any restaurant's health inspection record\n\n${r.name} is ${r.score}/100 with ${r.total} violations\n\nsuppersafe.com - top 1000 signups get free access` },
+        { weight: 1, template: (r) => `not to be that person but\n\n${r.name} is ${r.score}/100 on health inspection\n\nsuppersafe.com - top 1000 signups get free access` }
       ],
       critical: [
-        { weight: 3, template: (r) => `ok so you know those green/yellow/red signs in restaurant windows?\n\nyou can look up the actual reports online\n\njust checked ${r.name}... ${r.score}/100${r.topFinding ? `\n\nincluding ${r.topFinding.toLowerCase()}` : ''}\n\nsuppersafe.com` },
-        { weight: 2, template: (r) => `heads up about ${r.name} - they only scored ${r.score}/100 on food safety${r.crucial > 0 ? ` (${r.crucial} critical issue${r.crucial !== 1 ? 's' : ''})` : ''}\n\nmight want to pick somewhere else\n\nsuppersafe.com` }
+        { weight: 3, template: (r) => `ok so you know those green/yellow/red signs in restaurant windows?\n\nyou can look up the actual reports online\n\njust checked ${r.name}... ${r.score}/100${r.topFinding ? `\n\nincluding ${r.topFinding.toLowerCase()}` : ''}\n\nsuppersafe.com - top 1000 signups get free access` },
+        { weight: 2, template: (r) => `heads up about ${r.name} - they only scored ${r.score}/100 on food safety${r.crucial > 0 ? ` (${r.crucial} critical issue${r.crucial !== 1 ? 's' : ''})` : ''}\n\nmight want to pick somewhere else\n\nsuppersafe.com - top 1000 signups get free access` }
       ],
       pests: [
-        { weight: 4, template: (r) => `uhhhh so I looked up ${r.name}\n\nthey found pest evidence on the last health inspection\n\njust thought you should know\n\nsuppersafe.com` },
-        { weight: 2, template: (r) => `ok don't shoot the messenger but\n\n${r.name} had pest issues on their last inspection\n\nyou can look up any restaurant here: suppersafe.com` }
+        { weight: 4, template: (r) => `uhhhh so I looked up ${r.name}\n\nthey found pest evidence on the last health inspection\n\njust thought you should know\n\nsuppersafe.com - top 1000 signups get free access` },
+        { weight: 2, template: (r) => `ok don't shoot the messenger but\n\n${r.name} had pest issues on their last inspection\n\nsuppersafe.com - top 1000 signups get free access` }
       ],
       conditionalPass: [
-        { weight: 3, template: (r) => `heads up - ${r.name} is on conditional pass with health inspectors\n\n${r.score}/100\n\nyou can look up any restaurant: suppersafe.com` }
+        { weight: 3, template: (r) => `heads up - ${r.name} is on conditional pass with health inspectors\n\n${r.score}/100\n\nsuppersafe.com - top 1000 signups get free access` }
       ]
     },
 
@@ -3829,7 +3759,7 @@
 
       currentRestaurant = {
         id, name, address, status, crucial, significant, minor, total,
-        latestDate: latest?.date, inspections, safetyScore, percentile
+        latestDate: latest?.date, inspections, safetyScore, percentile, findings
       };
 
       // Update status bar
@@ -3843,17 +3773,30 @@
         ? `Inspected ${new Date(latest.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}`
         : '';
 
-      // Calculate reveal timing based on score (faster for good, slower for bad)
-      const revealDelay = safetyScore >= 90 ? 1200 : safetyScore >= 80 ? 1500 : safetyScore >= 70 ? 1800 : 2200;
-      const countUpDuration = safetyScore >= 90 ? 800 : safetyScore >= 80 ? 1000 : safetyScore >= 70 ? 1200 : 1500;
+      // Calculate reveal timing based on score (compressed for snappier feel)
+      const revealDelay = safetyScore >= 90 ? 800 : safetyScore >= 80 ? 900 : safetyScore >= 70 ? 1000 : 1200;
+      const countUpDuration = safetyScore >= 90 ? 600 : safetyScore >= 80 ? 700 : safetyScore >= 70 ? 800 : 1000;
 
-      // PHASE 1: Loading/Suspense (already visible)
+      // PHASE 1: Loading/Suspense with rotating messages
+      const loadingMessages = [
+        "Analyzing inspection records...",
+        "Checking violation history...",
+        "Calculating safety score..."
+      ];
+      let messageIndex = 0;
+      const loadingTextEl = document.getElementById('loadingText');
+      const loadingInterval = setInterval(() => {
+        messageIndex = (messageIndex + 1) % loadingMessages.length;
+        if (loadingTextEl) loadingTextEl.textContent = loadingMessages[messageIndex];
+      }, 400);
+
       await new Promise(resolve => setTimeout(resolve, revealDelay));
+      clearInterval(loadingInterval);
 
-      // PHASE 2: Hide loading, show score hero
+      // PHASE 2: Hide loading, show above-fold content
       document.getElementById('scoreLoading').style.display = 'none';
+      document.getElementById('reportAboveFold').style.display = 'block';
       const scoreHero = document.getElementById('safetyScoreHero');
-      scoreHero.style.display = 'block';
       scoreHero.classList.add('revealing');
 
       // Set CSS custom properties for colors
@@ -3932,25 +3875,87 @@
         const scoreLabel = document.getElementById('scoreLabel');
         scoreLabel.textContent = scoreDetails.label;
         scoreLabel.className = `score-label ${scoreDetails.class} revealed`;
-      }, 200);
+      }, 100);
 
-      // PHASE 5: Reveal percentile
+      // PHASE 5: Reveal percentile (prominent)
       setTimeout(() => {
         const scorePercentile = document.getElementById('scorePercentile');
         if (safetyScore >= 80) {
-          scorePercentile.innerHTML = `<strong>Cleaner than ${percentile}%</strong> of Toronto restaurants`;
+          scorePercentile.innerHTML = `Safer than <strong>${percentile}%</strong> of Toronto restaurants`;
         } else {
-          scorePercentile.innerHTML = `<strong>Worse than ${100 - percentile}%</strong> of Toronto restaurants`;
+          scorePercentile.innerHTML = `Worse than <strong>${100 - percentile}%</strong> of Toronto restaurants`;
         }
         scorePercentile.classList.add('revealed');
-      }, 350);
+      }, 200);
 
       // Update severity breakdown
       document.getElementById('crucialCount').textContent = crucial;
       document.getElementById('significantCount').textContent = significant;
       document.getElementById('minorCount').textContent = minor;
 
-      // PHASE 6: Show findings (if any)
+      // PHASE 6: Show share section (above fold)
+      setTimeout(() => {
+        const shareSection = document.getElementById('shareSection');
+        if (safetyScore < 60) {
+          setTimeout(() => shareSection.classList.add('highlight-warning'), 100);
+        }
+        shareSection.style.display = 'block';
+      }, 300);
+
+      // PHASE 7: Show below-fold content
+      setTimeout(() => {
+        const reportDetails = document.getElementById('reportDetails');
+        reportDetails.style.display = 'block';
+
+        // Scary callout for violations
+        if (findings.length > 0 && (crucial > 0 || significant > 0)) {
+          const scaryCallout = document.getElementById('scaryCallout');
+          const worstFinding = findings.find(f => f.severity.toUpperCase().startsWith('C')) ||
+                              findings.find(f => f.severity.toUpperCase().startsWith('S')) ||
+                              findings[0];
+          if (worstFinding) {
+            const translated = translateInfractionVisceral(worstFinding.text, worstFinding.severity);
+            document.getElementById('calloutText').textContent = `"${translated.text}"`;
+            document.getElementById('calloutDate').textContent = latest?.date
+              ? `Inspected ${new Date(latest.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}`
+              : '';
+            scaryCallout.style.display = 'flex';
+          }
+        }
+
+        // Timeline insight
+        const timelineInsight = document.getElementById('timelineInsight');
+        if (inspections.length >= 2) {
+          const prev = inspections.slice(1);
+          const prevAvg = prev.reduce((s, i) => s + i.infractions.length, 0) / prev.length;
+          const currentScore = safetyScore;
+
+          // Calculate score change over time
+          const oldInspections = inspections.slice(-3);
+          const oldTotal = oldInspections.reduce((s, i) => s + i.infractions.length, 0);
+          const oldAvgViolations = oldTotal / oldInspections.length;
+
+          if (total === 0 && prevAvg <= 1) {
+            timelineInsight.textContent = '✓ Clean record - no violations in their last 3 inspections';
+            timelineInsight.className = 'timeline-insight positive';
+          } else if (total > prevAvg * 1.5 && prevAvg > 0) {
+            const increase = Math.round(((total - prevAvg) / prevAvg) * 100);
+            timelineInsight.textContent = `📉 Violations up ${increase}% compared to their usual`;
+            timelineInsight.className = 'timeline-insight negative';
+          } else if (total < prevAvg * 0.5 && prevAvg > 1) {
+            timelineInsight.textContent = '📈 Improving - fewer violations than their historical average';
+            timelineInsight.className = 'timeline-insight positive';
+          } else if (total === 0) {
+            timelineInsight.textContent = '✓ Clean inspection - no issues found this visit';
+            timelineInsight.className = 'timeline-insight positive';
+          }
+          if (timelineInsight.textContent) {
+            timelineInsight.style.display = 'block';
+          }
+        }
+      }, 400);
+
+      // PHASE 8: Show findings (if any)
       setTimeout(() => {
         const findingsList = document.getElementById('findingsList');
         const findingsSection = document.getElementById('findingsSection');
@@ -3969,9 +3974,9 @@
           }
           findingsSection.style.display = 'block';
         }
-      }, 600);
+      }, 500);
 
-      // PHASE 7: Show history
+      // PHASE 9: Show history
       setTimeout(() => {
         const historySection = document.getElementById('historySection');
         historySection.style.display = 'block';
@@ -3987,84 +3992,86 @@
           const color = count === 0 ? 'clean' : count <= 2 ? 'warning' : 'danger';
           return `<div class="trend-bar ${color}" style="height:${height}px"></div>`;
         }).join('');
+      }, 600);
 
-        // Insight
-        const historyInsight = document.getElementById('historyInsight');
+      // PHASE 10: Show next inspection + CTA + footer
+      setTimeout(() => {
+        // Calculate next inspection expected
         if (inspections.length >= 2) {
-          const prev = inspections.slice(1);
-          const prevAvg = prev.reduce((s, i) => s + i.infractions.length, 0) / prev.length;
+          const dates = inspections.map(i => new Date(i.date));
+          const avgGapDays = dates.slice(0, -1).reduce((sum, d, i) => {
+            return sum + (d - dates[i + 1]) / (1000 * 60 * 60 * 24);
+          }, 0) / (dates.length - 1);
 
-          if (total === 0) {
-            historyInsight.className = 'history-insight positive';
-            historyInsight.innerHTML = `<strong>Clean inspection!</strong> No issues found this visit.`;
-          } else if (total > prevAvg * 2 && prevAvg > 0) {
-            const mult = Math.round(total / prevAvg);
-            historyInsight.className = 'history-insight';
-            historyInsight.innerHTML = `<strong>${mult}x more infractions</strong> than their usual ${prevAvg.toFixed(1)} per visit. Something changed.`;
-          } else if (total <= 1 && prevAvg <= 1) {
-            historyInsight.className = 'history-insight positive';
-            historyInsight.innerHTML = `<strong>Consistently clean.</strong> This is their typical track record.`;
-          } else {
-            historyInsight.className = 'history-insight neutral';
-            historyInsight.innerHTML = `<strong>About average</strong> for this restaurant (${prevAvg.toFixed(1)} per visit).`;
-          }
-        } else {
-          historyInsight.className = 'history-insight neutral';
-          historyInsight.innerHTML = `<strong>First inspection</strong> on record.`;
-        }
-      }, 800);
+          const lastDate = new Date(latest.date);
+          const nextDate = new Date(lastDate.getTime() + avgGapDays * 24 * 60 * 60 * 1000);
+          const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                             'July', 'August', 'September', 'October', 'November', 'December'];
 
-      // PHASE 8: Show share section with enhanced copy
-      setTimeout(() => {
-        const shareSection = document.getElementById('shareSection');
-        const shareHeader = document.getElementById('shareHeader');
-        const shareSubtext = document.getElementById('shareSubtext');
-
-        if (safetyScore >= 80) {
-          shareHeader.innerHTML = getIcon('sparkles', 16) + ' Share the good news';
-          shareSubtext.textContent = 'Let friends know about this clean spot';
-        } else if (safetyScore < 60) {
-          shareHeader.innerHTML = getIcon('alertTriangle', 16) + ' Warn your friends';
-          shareSubtext.textContent = 'They should know about this before eating here';
-          // Highlight share section for critical scores (call to action)
-          setTimeout(() => shareSection.classList.add('highlight-warning'), 200);
-        } else {
-          shareHeader.innerHTML = getIcon('share', 16) + ' Share this report';
-          shareSubtext.textContent = 'Let friends know what you found';
+          document.getElementById('nextDate').textContent = `~${monthNames[nextDate.getMonth()]} ${nextDate.getFullYear()}`;
+          document.getElementById('nextInspection').style.display = 'flex';
         }
 
-        shareSection.style.display = 'block';
-      }, 1000);
-
-      // PHASE 9: Show personalized CTA
-      setTimeout(() => {
+        // CTA adapts based on signup status
         const reportCta = document.getElementById('reportCta');
         const ctaText = document.getElementById('ctaText');
+        const isSignedUp = localStorage.getItem('suppersafe_unlocked') === 'true';
 
-        // Truncate name if too long
-        const shortName = name.length > 25 ? name.substring(0, 22) + '...' : name;
-        ctaText.textContent = `Alert me about ${shortName}`;
+        if (isSignedUp) {
+          ctaText.textContent = 'Share this report';
+          reportCta.style.display = 'flex';
+        } else {
+          ctaText.textContent = 'Sign up to get alerts like this';
+          reportCta.style.display = 'flex';
+          // Show email capture for non-signed-up users
+          document.getElementById('reportEmailCapture').style.display = 'block';
+        }
 
-        reportCta.style.display = 'flex';
-      }, 1100);
-
-      // PHASE 10: Show footer
-      setTimeout(() => {
         document.getElementById('reportFooter').style.display = 'flex';
         document.getElementById('dataSource').style.display = 'block';
-      }, 1200);
+      }, 700);
 
       // Event listeners
-      document.getElementById('reportClose').addEventListener('click', () => {
-        closeModal();
-        searchInput.focus();
+      const reportCta = document.getElementById('reportCta');
+      reportCta.addEventListener('click', () => {
+        const isSignedUp = localStorage.getItem('suppersafe_unlocked') === 'true';
+        if (isSignedUp) {
+          // Scroll to share section or copy link
+          const shareSection = document.getElementById('shareSection');
+          shareSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          closeModal();
+          document.getElementById('emailInput').focus();
+          document.querySelector('.signup-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       });
 
-      document.getElementById('reportCta').addEventListener('click', () => {
-        closeModal();
-        document.getElementById('emailInput').focus();
-        document.querySelector('.signup-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
+      // Email capture form handler
+      const captureForm = document.getElementById('captureForm');
+      if (captureForm) {
+        captureForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const honeypot = document.getElementById('hpCapture');
+          if (honeypot && honeypot.value) return; // Bot detected
+
+          const email = document.getElementById('captureEmail').value.trim();
+          if (!email) return;
+
+          const btn = captureForm.querySelector('button');
+          btn.disabled = true;
+          btn.textContent = 'Joining...';
+
+          try {
+            await signUpWithEmail(email);
+            document.getElementById('reportEmailCapture').style.display = 'none';
+            showToast('You\'re on the list!');
+          } catch (err) {
+            btn.disabled = false;
+            btn.textContent = 'Get Early Access';
+            showToast(err.message || 'Something went wrong');
+          }
+        });
+      }
 
       // Share handlers - using viral-optimized varied templates
       document.getElementById('shareTwitter').addEventListener('click', () => {
@@ -4111,7 +4118,6 @@
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-input-wrapper')) {
       searchResults.classList.remove('active');
-      stickyCta.classList.remove('search-active-hide');
     }
   });
 
@@ -4164,7 +4170,6 @@
     document.getElementById('successState').classList.add('active');
     document.getElementById('finalForm').classList.add('hidden');
     document.getElementById('finalSuccess').classList.add('active');
-    stickyCta.classList.add('hidden-complete');
     isUnlocked = true;
     localStorage.setItem('suppersafe_unlocked', 'true');
   }
@@ -4214,7 +4219,7 @@
       const { data } = await supabase.rpc('get_user_count');
       if (data !== null) {
         const count = data + 247;
-        ['waitlistCount', 'waitlistCountBottom', 'stickyCount'].forEach(id => {
+        ['waitlistCount', 'waitlistCountBottom'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = count;
         });
@@ -4222,37 +4227,11 @@
     } catch (e) {}
   })();
 
-  // Sticky CTA
-  const stickyCta = document.getElementById('stickyCta');
-  const signupCard = document.querySelector('.signup-card');
-
-  function handleScroll() {
-    if (hasSignedUp) return;
-    const rect = signupCard.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 50 && rect.bottom > 100) {
-      stickyCta.classList.remove('visible');
-    } else {
-      stickyCta.classList.add('visible');
-    }
-  }
-
-  setTimeout(() => { if (window.innerWidth <= 1000) handleScroll(); }, 300);
-  window.addEventListener('scroll', handleScroll, { passive: true });
-
-  document.getElementById('stickySubmit').addEventListener('click', () => {
-    if (isBot('hpSticky')) { return; }
-    const email = document.getElementById('stickyEmailInput').value.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
-    document.getElementById('stickySubmit').disabled = true;
-    document.getElementById('stickySubmit').textContent = '...';
-    signUpWithEmail(email);
-  });
-
   // Enter key
-  ['emailInput', 'finalEmailInput', 'stickyEmailInput'].forEach(id => {
+  ['emailInput', 'finalEmailInput'].forEach(id => {
     document.getElementById(id).addEventListener('keypress', e => {
       if (e.key === 'Enter') {
-        const btnId = id === 'emailInput' ? 'emailSubmit' : id === 'finalEmailInput' ? 'finalSubmit' : 'stickySubmit';
+        const btnId = id === 'emailInput' ? 'emailSubmit' : 'finalSubmit';
         document.getElementById(btnId).click();
       }
     });
@@ -4291,52 +4270,68 @@
   setInterval(updateCountdown, 1000);
 
   // ===========================================
-  // LIVE SIGNUP COUNTER ANIMATION
-  // ===========================================
-  let baseCount = CONFIG.INITIAL_WAITLIST_COUNT;
-  let displayCount = baseCount;
-
-  function simulateSignup() {
-    // Random increment between 5-20 seconds
-    const nextIncrement = Math.floor(Math.random() * 15000) + 5000;
-
-    setTimeout(() => {
-      displayCount++;
-
-      // Update all counter displays with animation
-      const counterEl = document.getElementById('waitlistCount');
-      if (counterEl) {
-        counterEl.textContent = displayCount;
-        counterEl.classList.add('bump');
-        setTimeout(() => counterEl.classList.remove('bump'), 300);
-      }
-
-      // Update other counters
-      ['waitlistCountBottom', 'stickyCount'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = displayCount;
-      });
-
-      simulateSignup();
-    }, nextIncrement);
-  }
-
-  // Start simulated signups after 3 seconds
-  setTimeout(simulateSignup, 3000);
-
-  // ===========================================
   // REFERRAL CODE SYSTEM
   // ===========================================
   let userReferralCode = localStorage.getItem('suppersafe_referral_code');
   let userQueuePosition = parseInt(localStorage.getItem('suppersafe_queue_position')) || null;
+  let userReferralCount = parseInt(localStorage.getItem('suppersafe_referral_count')) || 0;
 
   function generateReferralCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = 'SUPPER-';
-    for (let i = 0; i < 4; i++) {
+    let code = '';
+    for (let i = 0; i < 6; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return code;
+  }
+
+  function getReferralUrl() {
+    const code = userReferralCode || 'SUPPER';
+    return `suppersafe.com?ref=${code}`;
+  }
+
+  function updateReferralUI() {
+    const totalSignups = parseInt(document.getElementById('waitlistCount')?.textContent) || CONFIG.INITIAL_WAITLIST_COUNT;
+    const spotsLeft = Math.max(0, CONFIG.FREE_SPOTS_LIMIT - totalSignups);
+    const progressPercent = Math.min(100, (totalSignups / CONFIG.FREE_SPOTS_LIMIT) * 100);
+
+    // Update progress bar
+    const progressFill = document.getElementById('progressFill');
+    if (progressFill) progressFill.style.width = `${progressPercent}%`;
+
+    // Update spots left
+    const spotsLeftEl = document.getElementById('spotsLeft');
+    if (spotsLeftEl) spotsLeftEl.textContent = spotsLeft;
+
+    // Update user position
+    const positionEl = document.getElementById('userPosition');
+    if (positionEl) positionEl.textContent = userQueuePosition || CONFIG.QUEUE_START_POSITION;
+
+    // Update referral count and dots
+    const countEl = document.getElementById('referralCount');
+    if (countEl) countEl.textContent = userReferralCount;
+
+    const dot1 = document.getElementById('dot1');
+    const dot2 = document.getElementById('dot2');
+    if (dot1) dot1.textContent = userReferralCount >= 1 ? '●' : '○';
+    if (dot1) dot1.classList.toggle('filled', userReferralCount >= 1);
+    if (dot2) dot2.textContent = userReferralCount >= 2 ? '●' : '○';
+    if (dot2) dot2.classList.toggle('filled', userReferralCount >= 2);
+
+    // Show success state if 2+ referrals
+    const progressState = document.getElementById('referralProgressState');
+    const successState = document.getElementById('referralSuccessState');
+    if (userReferralCount >= CONFIG.REFERRALS_FOR_FREE) {
+      if (progressState) progressState.style.display = 'none';
+      if (successState) successState.style.display = 'block';
+    } else {
+      if (progressState) progressState.style.display = 'block';
+      if (successState) successState.style.display = 'none';
+    }
+
+    // Update referral code input
+    const codeInput = document.getElementById('referralCodeInput');
+    if (codeInput) codeInput.value = getReferralUrl();
   }
 
   function initReferralSystem(email) {
@@ -4353,16 +4348,8 @@
       localStorage.setItem('suppersafe_queue_position', userQueuePosition);
     }
 
-    // Update UI
-    const codeInput = document.getElementById('referralCodeInput');
-    if (codeInput) codeInput.value = userReferralCode;
-
-    const positionEl = document.getElementById('queuePosition');
-    if (positionEl) positionEl.textContent = `#${userQueuePosition}`;
-
-    // Update waitlist dashboard link with code param for bookmarking
-    const waitlistLink = document.getElementById('waitlistDashboardLink');
-    if (waitlistLink) waitlistLink.href = `waitlist.html?code=${userReferralCode}`;
+    // Update all UI elements
+    updateReferralUI();
 
     // Show "My Spot" link in nav
     const mySpotLink = document.getElementById('mySpotLink');
@@ -4379,6 +4366,31 @@
     }
   }
 
+  // Share message helpers
+  function getTwitterShareText() {
+    const referralUrl = getReferralUrl();
+    return `I just signed up for SupperSafe - alerts when Toronto restaurants fail health inspections. Top 1,000 get free access. Use my link to sign up (and help me lock in my free spot): ${referralUrl}`;
+  }
+
+  function getWhatsAppShareText() {
+    const referralUrl = getReferralUrl();
+    return `hey - found this app that tells you when toronto restaurants fail health inspections. kinda wild what some places have on their record. top 1000 signups get it free, can you sign up with my link? helps me lock in free access too: ${referralUrl}`;
+  }
+
+  function openTwitterShare() {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getTwitterShareText())}`, '_blank');
+  }
+
+  function openWhatsAppShare() {
+    window.open(`https://wa.me/?text=${encodeURIComponent(getWhatsAppShareText())}`, '_blank');
+  }
+
+  async function copyReferralLink() {
+    const link = `https://${getReferralUrl()}`;
+    await navigator.clipboard.writeText(link);
+    showToast('Link copied!');
+  }
+
   // Update showSuccess to init referral system
   const originalShowSuccess = showSuccess;
   showSuccess = function(msg) {
@@ -4389,22 +4401,20 @@
   // Referral button handlers (only run after DOM ready)
   document.addEventListener('DOMContentLoaded', function() {
     // Initialize counters from CONFIG
-    ['waitlistCount', 'waitlistCountBottom', 'stickyCount'].forEach(id => {
+    ['waitlistCount', 'waitlistCountBottom'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = CONFIG.INITIAL_WAITLIST_COUNT;
     });
-    const queueEl = document.getElementById('queuePosition');
-    if (queueEl) queueEl.textContent = '#' + CONFIG.QUEUE_START_POSITION;
 
-    // Copy referral code
+    // Copy referral code/link
     const copyCodeBtn = document.getElementById('copyReferralCode');
     if (copyCodeBtn) {
       copyCodeBtn.addEventListener('click', async () => {
-        const code = document.getElementById('referralCodeInput')?.value || userReferralCode;
-        await navigator.clipboard.writeText(code);
+        const link = `https://${getReferralUrl()}`;
+        await navigator.clipboard.writeText(link);
         copyCodeBtn.textContent = 'Copied!';
         copyCodeBtn.classList.add('copied');
-        showToast('Code copied!');
+        showToast('Link copied!');
         setTimeout(() => {
           copyCodeBtn.textContent = 'Copy';
           copyCodeBtn.classList.remove('copied');
@@ -4412,36 +4422,15 @@
       });
     }
 
-    // Share on Twitter
-    const twitterBtn = document.getElementById('referralTwitter');
-    if (twitterBtn) {
-      twitterBtn.addEventListener('click', () => {
-        const code = userReferralCode || 'SUPPER';
-        const text = `I just signed up for SupperSafe - real-time restaurant health alerts for Toronto.\n\nUse my code ${code} to jump ahead in line:\nsuppersafe.com?ref=${code}`;
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-      });
-    }
+    // Progress state share buttons
+    document.getElementById('referralTwitter')?.addEventListener('click', openTwitterShare);
+    document.getElementById('referralWhatsapp')?.addEventListener('click', openWhatsAppShare);
+    document.getElementById('referralLink')?.addEventListener('click', copyReferralLink);
 
-    // Share on WhatsApp
-    const whatsappBtn = document.getElementById('referralWhatsapp');
-    if (whatsappBtn) {
-      whatsappBtn.addEventListener('click', () => {
-        const code = userReferralCode || 'SUPPER';
-        const text = `Hey! I signed up for this app that alerts you when Toronto restaurants fail health inspections. Pretty useful tbh.\n\nUse my code to jump the line: ${code}\nsuppersafe.com?ref=${code}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-      });
-    }
-
-    // Copy referral link
-    const linkBtn = document.getElementById('referralLink');
-    if (linkBtn) {
-      linkBtn.addEventListener('click', async () => {
-        const code = userReferralCode || 'SUPPER';
-        const link = `https://suppersafe.com?ref=${code}`;
-        await navigator.clipboard.writeText(link);
-        showToast('Link copied!');
-      });
-    }
+    // Success state share buttons
+    document.getElementById('referralTwitterSuccess')?.addEventListener('click', openTwitterShare);
+    document.getElementById('referralWhatsappSuccess')?.addEventListener('click', openWhatsAppShare);
+    document.getElementById('referralLinkSuccess')?.addEventListener('click', copyReferralLink);
   });
 
   // If already signed up, init referral system
