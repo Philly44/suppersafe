@@ -4135,9 +4135,7 @@
           ctaText.textContent = 'Share this report';
           reportCta.style.display = 'flex';
         } else {
-          ctaText.textContent = 'Sign up to get alerts like this';
-          reportCta.style.display = 'flex';
-          // Show email capture for non-signed-up users
+          // Show only email capture for non-signed-up users (no redundant button)
           document.getElementById('reportEmailCapture').style.display = 'block';
         }
 
