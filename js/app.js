@@ -284,13 +284,10 @@
   initTicker();
 
   // ===========================================
-  // CONFIG - Centralized magic numbers
+  // CONFIG - Centralized constants
   // ===========================================
   const CONFIG = {
-    INITIAL_WAITLIST_COUNT: 247,
-    QUEUE_START_POSITION: 248,
-    FREE_SPOTS_LIMIT: 1000,
-    REFERRALS_FOR_FREE: 2,
+    INITIAL_USER_COUNT: 247,
   };
 
   // State
@@ -309,16 +306,6 @@
   // Check if already unlocked (localStorage)
   if (localStorage.getItem('suppersafe_unlocked') === 'true') {
     isUnlocked = true;
-
-    // Show "My Spot" link in nav
-    const mySpotLink = document.getElementById('mySpotLink');
-    const userCode = localStorage.getItem('suppersafe_referral_code');
-    if (mySpotLink) {
-      mySpotLink.classList.add('visible');
-      if (userCode) {
-        mySpotLink.href = `waitlist.html?code=${userCode}`;
-      }
-    }
   }
 
   function debounce(func, wait) {
@@ -613,24 +600,24 @@
       ],
       // Poor (60-69)
       poor: [
-        { weight: 2, template: (r) => `PSA: you can look up any Toronto restaurant's health inspection for free.\n\n${r.name}? ${r.score}/100 with ${r.total} violations.\n\nsuppersafe.com - Top 1,000 signups get free access.` },
-        { weight: 1, template: (r) => `That place you're going to might have health violations on file.\n\n${r.name}: ${r.score}/100, ${r.total} issues.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
+        { weight: 2, template: (r) => `PSA: you can look up any Toronto restaurant's health inspection for free.\n\n${r.name}? ${r.score}/100 with ${r.total} violations.\n\nsuppersafe.com` },
+        { weight: 1, template: (r) => `That place you're going to might have health violations on file.\n\n${r.name}: ${r.score}/100, ${r.total} issues.\n\nsuppersafe.com` }
       ],
       // Critical (<60)
       critical: [
-        { weight: 3, template: (r) => `Safety Alert: ${r.name} scored just ${r.score}/100 on their health inspection${r.crucial > 0 ? ` with ${r.crucial} critical violation${r.crucial !== 1 ? 's' : ''}` : ''}.\n\nCheck before you eat: suppersafe.com. Top 1,000 signups get free access.` },
-        { weight: 2, template: (r) => `Just looked up ${r.name} before booking. ${r.score}/100 on safety. ${r.total} violations.${r.topFinding ? `\n\nIncluding "${r.topFinding}."` : ''}\n\nsuppersafe.com - Top 1,000 signups get free access.` },
-        { weight: 2, template: (r) => `Friendly reminder that restaurant health inspections are public record.\n\n${r.name}: ${r.score}/100, ${r.total} violations.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
+        { weight: 3, template: (r) => `Safety Alert: ${r.name} scored just ${r.score}/100 on their health inspection${r.crucial > 0 ? ` with ${r.crucial} critical violation${r.crucial !== 1 ? 's' : ''}` : ''}.\n\nCheck before you eat: suppersafe.com` },
+        { weight: 2, template: (r) => `Just looked up ${r.name} before booking. ${r.score}/100 on safety. ${r.total} violations.${r.topFinding ? `\n\nIncluding "${r.topFinding}."` : ''}\n\nsuppersafe.com` },
+        { weight: 2, template: (r) => `Friendly reminder that restaurant health inspections are public record.\n\n${r.name}: ${r.score}/100, ${r.total} violations.\n\nsuppersafe.com` }
       ],
       // Pest-specific (overrides score tier when detected)
       pests: [
-        { weight: 4, template: (r) => `Looked up ${r.name} and... they found pest evidence on the last inspection.\n\nCheck any Toronto restaurant: suppersafe.com. Top 1,000 signups get free access.` },
-        { weight: 2, template: (r) => `Maybe don't read this if you've eaten at ${r.name} recently.\n\nPest evidence on their last health inspection.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
+        { weight: 4, template: (r) => `Looked up ${r.name} and... they found pest evidence on the last inspection.\n\nCheck any Toronto restaurant: suppersafe.com` },
+        { weight: 2, template: (r) => `Maybe don't read this if you've eaten at ${r.name} recently.\n\nPest evidence on their last health inspection.\n\nsuppersafe.com` }
       ],
       // Conditional pass status
       conditionalPass: [
-        { weight: 3, template: (r) => `${r.name} is on "Conditional Pass" status with Toronto Public Health. ${r.score}/100.\n\nLook up any restaurant: suppersafe.com. Top 1,000 signups get free access.` },
-        { weight: 2, template: (r) => `TIL ${r.name} has a conditional pass from health inspectors. Might want to check your regular spots too.\n\nsuppersafe.com - Top 1,000 signups get free access.` }
+        { weight: 3, template: (r) => `${r.name} is on "Conditional Pass" status with Toronto Public Health. ${r.score}/100.\n\nLook up any restaurant: suppersafe.com` },
+        { weight: 2, template: (r) => `TIL ${r.name} has a conditional pass from health inspectors. Might want to check your regular spots too.\n\nsuppersafe.com` }
       ]
     },
 
@@ -646,19 +633,19 @@
         { weight: 2, template: (r) => `looked up ${r.name}\n\n${r.score}/100, ${r.total} minor thing${r.total !== 1 ? 's' : ''} on their last inspection\n\nyou can check any restaurant: suppersafe.com` }
       ],
       poor: [
-        { weight: 2, template: (r) => `before you book that dinner reservation\n\nyou can look up any restaurant's health inspection record\n\n${r.name} is ${r.score}/100 with ${r.total} violations\n\nsuppersafe.com - top 1000 signups get free access` },
-        { weight: 1, template: (r) => `not to be that person but\n\n${r.name} is ${r.score}/100 on health inspection\n\nsuppersafe.com - top 1000 signups get free access` }
+        { weight: 2, template: (r) => `before you book that dinner reservation\n\nyou can look up any restaurant's health inspection record\n\n${r.name} is ${r.score}/100 with ${r.total} violations\n\nsuppersafe.com` },
+        { weight: 1, template: (r) => `not to be that person but\n\n${r.name} is ${r.score}/100 on health inspection\n\nsuppersafe.com` }
       ],
       critical: [
-        { weight: 3, template: (r) => `ok so you know those green/yellow/red signs in restaurant windows?\n\nyou can look up the actual reports online\n\njust checked ${r.name}... ${r.score}/100${r.topFinding ? `\n\nincluding ${r.topFinding.toLowerCase()}` : ''}\n\nsuppersafe.com - top 1000 signups get free access` },
-        { weight: 2, template: (r) => `heads up about ${r.name} - they only scored ${r.score}/100 on food safety${r.crucial > 0 ? ` (${r.crucial} critical issue${r.crucial !== 1 ? 's' : ''})` : ''}\n\nmight want to pick somewhere else\n\nsuppersafe.com - top 1000 signups get free access` }
+        { weight: 3, template: (r) => `ok so you know those green/yellow/red signs in restaurant windows?\n\nyou can look up the actual reports online\n\njust checked ${r.name}... ${r.score}/100${r.topFinding ? `\n\nincluding ${r.topFinding.toLowerCase()}` : ''}\n\nsuppersafe.com` },
+        { weight: 2, template: (r) => `heads up about ${r.name} - they only scored ${r.score}/100 on food safety${r.crucial > 0 ? ` (${r.crucial} critical issue${r.crucial !== 1 ? 's' : ''})` : ''}\n\nmight want to pick somewhere else\n\nsuppersafe.com` }
       ],
       pests: [
-        { weight: 4, template: (r) => `uhhhh so I looked up ${r.name}\n\nthey found pest evidence on the last health inspection\n\njust thought you should know\n\nsuppersafe.com - top 1000 signups get free access` },
-        { weight: 2, template: (r) => `ok don't shoot the messenger but\n\n${r.name} had pest issues on their last inspection\n\nsuppersafe.com - top 1000 signups get free access` }
+        { weight: 4, template: (r) => `uhhhh so I looked up ${r.name}\n\nthey found pest evidence on the last health inspection\n\njust thought you should know\n\nsuppersafe.com` },
+        { weight: 2, template: (r) => `ok don't shoot the messenger but\n\n${r.name} had pest issues on their last inspection\n\nsuppersafe.com` }
       ],
       conditionalPass: [
-        { weight: 3, template: (r) => `heads up - ${r.name} is on conditional pass with health inspectors\n\n${r.score}/100\n\nsuppersafe.com - top 1000 signups get free access` }
+        { weight: 3, template: (r) => `heads up - ${r.name} is on conditional pass with health inspectors\n\n${r.score}/100\n\nsuppersafe.com` }
       ]
     },
 
@@ -1274,32 +1261,21 @@
     }
   });
 
-  // Auth - All signup logic handled by Edge Function
+  // Auth - User signup using Supabase Auth
   async function signUpWithEmail(email) {
     try {
-      const referredBy = localStorage.getItem('suppersafe_referred_by') || null;
-
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/waitlist-signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          email,
-          referredBy
-        })
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Signup failed');
+      if (error) {
+        throw new Error(error.message);
       }
 
       // Save to localStorage
-      localStorage.setItem('suppersafe_referral_code', data.referral_code);
-      localStorage.setItem('suppersafe_queue_position', data.queue_position);
       localStorage.setItem('suppersafe_unlocked', 'true');
 
       showSuccess('Check your email to confirm.');
@@ -1358,24 +1334,22 @@
   (async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      showSuccess('You\'re on the list!');
+      showSuccess('You\'re in!');
     }
   })();
 
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) showSuccess('You\'re on the list!');
+    if (event === 'SIGNED_IN' && session) showSuccess('You\'re in!');
   });
 
-  // Waitlist count
+  // User count
   (async () => {
     try {
       const { data } = await supabase.rpc('get_user_count');
       if (data !== null) {
-        const count = data + 247;
-        ['waitlistCount', 'waitlistCountBottom'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = count;
-        });
+        const count = data + CONFIG.INITIAL_USER_COUNT;
+        const el = document.getElementById('userCount');
+        if (el) el.textContent = count;
       }
     } catch (e) {}
   })();
@@ -1390,203 +1364,8 @@
     });
   });
 
-  // ===========================================
-  // COUNTDOWN TIMER TO JANUARY 1, 2026
-  // ===========================================
-  const launchDate = new Date('2026-01-01T00:00:00-05:00'); // EST timezone
-
-  function updateCountdown() {
-    const now = new Date();
-    const diff = launchDate - now;
-
-    if (diff <= 0) {
-      document.getElementById('countdownDays').textContent = '00';
-      document.getElementById('countdownHours').textContent = '00';
-      document.getElementById('countdownMinutes').textContent = '00';
-      document.getElementById('countdownSeconds').textContent = '00';
-      return;
-    }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    document.getElementById('countdownDays').textContent = days.toString().padStart(2, '0');
-    document.getElementById('countdownHours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('countdownMinutes').textContent = minutes.toString().padStart(2, '0');
-    document.getElementById('countdownSeconds').textContent = seconds.toString().padStart(2, '0');
-  }
-
-  // Initial update and start interval
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-  // ===========================================
-  // REFERRAL CODE SYSTEM
-  // ===========================================
-  let userReferralCode = localStorage.getItem('suppersafe_referral_code');
-  let userQueuePosition = parseInt(localStorage.getItem('suppersafe_queue_position')) || null;
-  let userReferralCount = parseInt(localStorage.getItem('suppersafe_referral_count')) || 0;
-
-  function generateReferralCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-  }
-
-  function getReferralUrl() {
-    const code = userReferralCode || 'SUPPER';
-    return `suppersafe.com?ref=${code}`;
-  }
-
-  function updateReferralUI() {
-    const totalSignups = parseInt(document.getElementById('waitlistCount')?.textContent) || CONFIG.INITIAL_WAITLIST_COUNT;
-    const spotsLeft = Math.max(0, CONFIG.FREE_SPOTS_LIMIT - totalSignups);
-    const progressPercent = Math.min(100, (totalSignups / CONFIG.FREE_SPOTS_LIMIT) * 100);
-
-    // Update progress bar
-    const progressFill = document.getElementById('progressFill');
-    if (progressFill) progressFill.style.width = `${progressPercent}%`;
-
-    // Update spots left
-    const spotsLeftEl = document.getElementById('spotsLeft');
-    if (spotsLeftEl) spotsLeftEl.textContent = spotsLeft;
-
-    // Update user position
-    const positionEl = document.getElementById('userPosition');
-    if (positionEl) positionEl.textContent = userQueuePosition || CONFIG.QUEUE_START_POSITION;
-
-    // Update referral count and dots
-    const countEl = document.getElementById('referralCount');
-    if (countEl) countEl.textContent = userReferralCount;
-
-    const dot1 = document.getElementById('dot1');
-    const dot2 = document.getElementById('dot2');
-    if (dot1) dot1.textContent = userReferralCount >= 1 ? '●' : '○';
-    if (dot1) dot1.classList.toggle('filled', userReferralCount >= 1);
-    if (dot2) dot2.textContent = userReferralCount >= 2 ? '●' : '○';
-    if (dot2) dot2.classList.toggle('filled', userReferralCount >= 2);
-
-    // Show success state if 2+ referrals
-    const progressState = document.getElementById('referralProgressState');
-    const successState = document.getElementById('referralSuccessState');
-    if (userReferralCount >= CONFIG.REFERRALS_FOR_FREE) {
-      if (progressState) progressState.style.display = 'none';
-      if (successState) successState.style.display = 'block';
-    } else {
-      if (progressState) progressState.style.display = 'block';
-      if (successState) successState.style.display = 'none';
-    }
-
-    // Update referral code input
-    const codeInput = document.getElementById('referralCodeInput');
-    if (codeInput) codeInput.value = getReferralUrl();
-  }
-
-  function initReferralSystem(email) {
-    // Generate code if not exists
-    if (!userReferralCode) {
-      userReferralCode = generateReferralCode();
-      localStorage.setItem('suppersafe_referral_code', userReferralCode);
-    }
-
-    // Set queue position based on current waitlist
-    if (!userQueuePosition) {
-      const waitlistEl = document.getElementById('waitlistCount');
-      userQueuePosition = parseInt(waitlistEl?.textContent) || CONFIG.QUEUE_START_POSITION;
-      localStorage.setItem('suppersafe_queue_position', userQueuePosition);
-    }
-
-    // Update all UI elements
-    updateReferralUI();
-
-    // Show "My Spot" link in nav
-    const mySpotLink = document.getElementById('mySpotLink');
-    if (mySpotLink) {
-      mySpotLink.classList.add('visible');
-      mySpotLink.href = `waitlist.html?code=${userReferralCode}`;
-    }
-
-    // Check URL for referral param (someone used a referral link)
-    const urlParams = new URLSearchParams(window.location.search);
-    const referredBy = urlParams.get('ref');
-    if (referredBy && referredBy !== userReferralCode) {
-      localStorage.setItem('suppersafe_referred_by', referredBy);
-    }
-  }
-
-  // Share message helpers
-  function getTwitterShareText() {
-    const referralUrl = getReferralUrl();
-    return `I just signed up for SupperSafe - alerts when Toronto restaurants fail health inspections. Top 1,000 get free access. Use my link to sign up (and help me lock in my free spot): ${referralUrl}`;
-  }
-
-  function getWhatsAppShareText() {
-    const referralUrl = getReferralUrl();
-    return `hey - found this app that tells you when toronto restaurants fail health inspections. kinda wild what some places have on their record. top 1000 signups get it free, can you sign up with my link? helps me lock in free access too: ${referralUrl}`;
-  }
-
-  function openTwitterShare() {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getTwitterShareText())}`, '_blank');
-  }
-
-  function openWhatsAppShare() {
-    window.open(`https://wa.me/?text=${encodeURIComponent(getWhatsAppShareText())}`, '_blank');
-  }
-
-  async function copyReferralLink() {
-    const link = `https://${getReferralUrl()}`;
-    await navigator.clipboard.writeText(link);
-    showToast('Link copied!');
-  }
-
-  // Update showSuccess to init referral system
-  const originalShowSuccess = showSuccess;
-  showSuccess = function(msg) {
-    originalShowSuccess(msg);
-    initReferralSystem();
-  };
-
-  // Referral button handlers (only run after DOM ready)
+  // Initialize user count display on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize counters from CONFIG
-    ['waitlistCount', 'waitlistCountBottom'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = CONFIG.INITIAL_WAITLIST_COUNT;
-    });
-
-    // Copy referral code/link
-    const copyCodeBtn = document.getElementById('copyReferralCode');
-    if (copyCodeBtn) {
-      copyCodeBtn.addEventListener('click', async () => {
-        const link = `https://${getReferralUrl()}`;
-        await navigator.clipboard.writeText(link);
-        copyCodeBtn.textContent = 'Copied!';
-        copyCodeBtn.classList.add('copied');
-        showToast('Link copied!');
-        setTimeout(() => {
-          copyCodeBtn.textContent = 'Copy';
-          copyCodeBtn.classList.remove('copied');
-        }, 2000);
-      });
-    }
-
-    // Progress state share buttons
-    document.getElementById('referralTwitter')?.addEventListener('click', openTwitterShare);
-    document.getElementById('referralWhatsapp')?.addEventListener('click', openWhatsAppShare);
-    document.getElementById('referralLink')?.addEventListener('click', copyReferralLink);
-
-    // Success state share buttons
-    document.getElementById('referralTwitterSuccess')?.addEventListener('click', openTwitterShare);
-    document.getElementById('referralWhatsappSuccess')?.addEventListener('click', openWhatsAppShare);
-    document.getElementById('referralLinkSuccess')?.addEventListener('click', copyReferralLink);
+    const el = document.getElementById('userCount');
+    if (el) el.textContent = CONFIG.INITIAL_USER_COUNT;
   });
-
-  // If already signed up, init referral system
-  if (localStorage.getItem('suppersafe_unlocked') === 'true' && userReferralCode) {
-    initReferralSystem();
-  }
