@@ -2,15 +2,29 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator, View } from 'react-native';
 
+import { useAuth } from '../contexts/AuthContext';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import SavedScreen from '../screens/SavedScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import RestaurantDetailScreen from '../screens/RestaurantDetailScreen';
+import LoginScreen from '../screens/LoginScreen';
+import SignupScreen from '../screens/SignupScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
+
+function AuthNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Signup" component={SignupScreen} />
+    </AuthStack.Navigator>
+  );
+}
 
 function TabNavigator() {
   return (
@@ -71,7 +85,7 @@ function TabNavigator() {
   );
 }
 
-export default function RootNavigator() {
+function MainNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -90,4 +104,18 @@ export default function RootNavigator() {
       />
     </Stack.Navigator>
   );
+}
+
+export default function RootNavigator() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FAF9F7' }}>
+        <ActivityIndicator size="large" color="#2D5A3D" />
+      </View>
+    );
+  }
+
+  return user ? <MainNavigator /> : <AuthNavigator />;
 }

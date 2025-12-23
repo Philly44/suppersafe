@@ -1,14 +1,48 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SettingsScreen() {
+  const { user, signOut, isFoundingMember } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+
+  function handleSignOut() {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: signOut },
+      ]
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.content}>
+        {/* Account Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <View style={styles.accountCard}>
+            <View style={styles.accountInfo}>
+              <View style={styles.avatarCircle}>
+                <Ionicons name="person" size={24} color="#FFFFFF" />
+              </View>
+              <View style={styles.accountDetails}>
+                <Text style={styles.accountEmail}>{user?.email}</Text>
+                {isFoundingMember && (
+                  <View style={styles.foundingBadge}>
+                    <Ionicons name="star" size={12} color="#F97316" />
+                    <Text style={styles.foundingText}>Founding Member</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+
         {/* Notifications Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Notifications</Text>
@@ -61,6 +95,12 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Sign Out Button */}
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <Ionicons name="log-out-outline" size={20} color="#DC2626" />
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+
         {/* Footer */}
         <View style={styles.footer}>
           <View style={styles.logoContainer}>
@@ -87,7 +127,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 12,
@@ -96,6 +136,43 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 12,
+  },
+  accountCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+  },
+  accountInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  avatarCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#2D5A3D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  accountDetails: {
+    flex: 1,
+  },
+  accountEmail: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  foundingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  foundingText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#F97316',
   },
   settingItem: {
     flexDirection: 'row',
@@ -137,6 +214,21 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#1a1a1a',
+  },
+  signOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+    marginBottom: 24,
+  },
+  signOutText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#DC2626',
   },
   footer: {
     marginTop: 'auto',
