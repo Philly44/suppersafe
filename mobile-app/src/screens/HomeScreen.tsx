@@ -67,6 +67,13 @@ export default function HomeScreen() {
         style={styles.scrollView}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Founding Member Banner */}
+        <View style={styles.foundingBanner}>
+          <Text style={styles.foundingLabel}>FOUNDING MEMBER</Text>
+          <Text style={styles.foundingTitle}>Lifetime Free Access</Text>
+          <Text style={styles.foundingDesc}>First 100 signups get alerts forever</Text>
+        </View>
+
         {/* Hero Section */}
         <View style={styles.hero}>
           <Text style={styles.heroTitle}>
@@ -162,6 +169,31 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  foundingBanner: {
+    backgroundColor: '#2D5A3D',
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  foundingLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.7)',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  foundingTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  foundingDesc: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
   },
   hero: {
     paddingHorizontal: 20,

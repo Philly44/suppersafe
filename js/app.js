@@ -287,7 +287,8 @@
   // CONFIG - Centralized constants
   // ===========================================
   const CONFIG = {
-    INITIAL_USER_COUNT: 247,
+    INITIAL_USER_COUNT: 0,
+    FOUNDING_MEMBER_LIMIT: 100,
   };
 
   // State
@@ -1339,17 +1340,23 @@
   })();
 
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) showSuccess('You\'re in!');
+    if (event === 'SIGNED_IN' && session) showSuccess('You\'re a founding member!');
   });
 
-  // User count
+  // Founding member spots remaining
   (async () => {
     try {
       const { data } = await supabase.rpc('get_user_count');
-      if (data !== null) {
-        const count = data + CONFIG.INITIAL_USER_COUNT;
-        const el = document.getElementById('userCount');
-        if (el) el.textContent = count;
+      const currentUsers = (data || 0) + CONFIG.INITIAL_USER_COUNT;
+      const spotsLeft = Math.max(0, CONFIG.FOUNDING_MEMBER_LIMIT - currentUsers);
+
+      const el = document.getElementById('spotsLeft');
+      if (el) {
+        el.textContent = spotsLeft;
+        // Add urgency styling when low
+        if (spotsLeft <= 10) {
+          el.style.animation = 'livePulse 1.5s ease-in-out infinite';
+        }
       }
     } catch (e) {}
   })();
@@ -1364,8 +1371,8 @@
     });
   });
 
-  // Initialize user count display on DOM ready
+  // Initialize spots display on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
-    const el = document.getElementById('userCount');
-    if (el) el.textContent = CONFIG.INITIAL_USER_COUNT;
+    const el = document.getElementById('spotsLeft');
+    if (el) el.textContent = CONFIG.FOUNDING_MEMBER_LIMIT;
   });

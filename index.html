@@ -72,14 +72,15 @@
 
     <div class="signup-card">
       <div class="form-state" id="formState">
-        <h2 class="display">Get Protected</h2>
-        <p class="signup-desc">We'll alert you when your saved restaurants fail inspection.</p>
-        <p class="signup-desc live-counter"><span class="live-dot"></span> <strong class="counter-value" id="userCount">247</strong> people already signed up</p>
+        <p class="signup-label">Founding Member</p>
+        <h2 class="display">Get Lifetime Free Access</h2>
+        <p class="signup-desc">First 100 signups get alerts forever. No catch.</p>
+        <p class="signup-desc live-counter"><span class="live-dot"></span> <strong class="founding-value" id="spotsLeft">100</strong> spots remaining</p>
 
         <div class="error-message" id="errorMessage"></div>
         <input type="email" class="auth-input" id="emailInput" placeholder="Your email" required>
         <input type="text" name="website" class="hp-field" id="hpMain" tabindex="-1" autocomplete="off">
-        <button type="button" class="btn-primary" id="emailSubmit">Sign Up Free</button>
+        <button type="button" class="btn-primary" id="emailSubmit">Claim My Spot</button>
 
         <div class="auth-divider"><span>or</span></div>
 
@@ -93,8 +94,8 @@
         <div class="success-icon">
           <div class="success-icon-inner"></div>
         </div>
-        <h3 class="display">You're in!</h3>
-        <p id="successMessage">We'll notify you when your saved restaurants get inspected.</p>
+        <h3 class="display">You're a Founding Member!</h3>
+        <p id="successMessage">Lifetime free access locked in. We'll notify you when your saved restaurants get inspected.</p>
       </div>
     </div>
 
@@ -225,9 +226,9 @@
           <form class="capture-form" id="captureForm">
             <input type="email" class="capture-email" id="captureEmail" placeholder="Your email" required>
             <input type="text" name="website" class="hp-field" id="hpCapture" tabindex="-1" autocomplete="off">
-            <button type="submit" class="btn-primary">Sign Up Free</button>
+            <button type="submit" class="btn-primary">Claim My Spot</button>
           </form>
-          <p class="capture-fine">Free forever. No credit card required.</p>
+          <p class="capture-fine">First 100 get lifetime free access</p>
         </div>
 
         <!-- CTA Button (adapts based on signup status) -->
@@ -260,10 +261,10 @@
     <div class="gate-form">
       <input type="email" class="auth-input" id="gateEmailInput" placeholder="Your email" required>
       <input type="text" name="company" class="hp-field" id="hpGate" tabindex="-1" autocomplete="off">
-      <button type="button" class="btn-primary" id="gateSubmit">Sign Up Free</button>
+      <button type="button" class="btn-primary" id="gateSubmit">Claim My Spot</button>
     </div>
 
-    <p class="gate-fine">Free forever. No credit card required.</p>
+    <p class="gate-fine">First 100 get lifetime free access</p>
 
     <button class="gate-skip" id="gateSkip">Skip for now</button>
   </div>
@@ -310,7 +311,7 @@
 
     <div class="faq-item">
       <h3>Is this really free?</h3>
-      <p>Yes. SupperSafe is completely free to use. No credit card required.</p>
+      <p>The first 100 members get lifetime free access. After that, we'll introduce a small monthly fee - but founding members keep free access forever.</p>
     </div>
 
     <div class="faq-item">
@@ -328,11 +329,11 @@
     <div class="final-cta-form" id="finalForm">
       <input type="email" class="auth-input" id="finalEmailInput" placeholder="Your email">
       <input type="text" name="url" class="hp-field" id="hpFinal" tabindex="-1" autocomplete="off">
-      <button type="button" class="btn-primary" id="finalSubmit">Sign Up Free</button>
-      <p class="cta-value-line">Free forever. No credit card required.</p>
+      <button type="button" class="btn-primary" id="finalSubmit">Claim My Spot</button>
+      <p class="cta-value-line">First 100 get lifetime free access</p>
     </div>
 
-    <p class="final-success" id="finalSuccess">You're in! We'll notify you when your saved restaurants get inspected.</p>
+    <p class="final-success" id="finalSuccess">You're a founding member! Lifetime free access locked in.</p>
   </div>
 </section>
 
