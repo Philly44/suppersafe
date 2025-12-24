@@ -92,3 +92,95 @@ export async function getRecentInspections(): Promise<Inspection[]> {
   if (error) throw error;
   return data || [];
 }
+
+// Saved restaurants types and functions
+export interface SavedRestaurant {
+  id: string;
+  user_id: string;
+  establishment_id: string;
+  establishment_name: string;
+  establishment_address: string | null;
+  last_inspection_date: string | null;
+  last_score: number | null;
+  created_at: string;
+}
+
+// Get all saved restaurants for current user
+export async function getSavedRestaurants(): Promise<SavedRestaurant[]> {
+  const { data, error } = await supabase
+    .from('saved_restaurants')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+// Check if a restaurant is saved
+export async function isRestaurantSaved(establishmentId: string | number): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('saved_restaurants')
+    .select('id')
+    .eq('establishment_id', String(establishmentId))
+    .maybeSingle();
+
+  if (error) throw error;
+  return !!data;
+}
+
+// Save a restaurant
+export async function saveRestaurant(restaurant: {
+  establishment_id: string | number;
+  establishment_name: string;
+  establishment_address?: string;
+  last_inspection_date?: string;
+  last_score?: number;
+}): Promise<SavedRestaurant> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Must be logged in to save restaurants');
+
+  const { data, error } = await supabase
+    .from('saved_restaurants')
+    .insert({
+      user_id: user.id,
+      establishment_id: String(restaurant.establishment_id),
+      establishment_name: restaurant.establishment_name,
+      establishment_address: restaurant.establishment_address || null,
+      last_inspection_date: restaurant.last_inspection_date || null,
+      last_score: restaurant.last_score || null,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// Unsave a restaurant
+export async function unsaveRestaurant(establishmentId: string | number): Promise<void> {
+  const { error } = await supabase
+    .from('saved_restaurants')
+    .delete()
+    .eq('establishment_id', String(establishmentId));
+
+  if (error) throw error;
+}
+
+// Toggle save status
+export async function toggleSaveRestaurant(restaurant: {
+  establishment_id: string | number;
+  establishment_name: string;
+  establishment_address?: string;
+  last_inspection_date?: string;
+  last_score?: number;
+}): Promise<boolean> {
+  const isSaved = await isRestaurantSaved(restaurant.establishment_id);
+
+  if (isSaved) {
+    await unsaveRestaurant(restaurant.establishment_id);
+    return false;
+  } else {
+    await saveRestaurant(restaurant);
+    return true;
+  }
+}

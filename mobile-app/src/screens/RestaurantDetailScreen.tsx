@@ -7,12 +7,14 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Share,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { getRestaurantInspections, Inspection } from '../services/supabase';
+import { useSaved } from '../contexts/SavedContext';
 import {
   calculateSafetyScore,
   getScoreDetails,
@@ -36,6 +38,7 @@ interface InspectionGroup {
 export default function RestaurantDetailScreen() {
   const route = useRoute();
   const { establishmentId, name, address } = route.params as RouteParams;
+  const { isSaved, toggleSave } = useSaved();
 
   const [loading, setLoading] = useState(true);
   const [inspections, setInspections] = useState<InspectionGroup[]>([]);
@@ -44,6 +47,9 @@ export default function RestaurantDetailScreen() {
   const [percentile, setPercentile] = useState(0);
   const [violationCounts, setViolationCounts] = useState({ crucial: 0, significant: 0, minor: 0 });
   const [latestStatus, setLatestStatus] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const saved = isSaved(establishmentId);
 
   useEffect(() => {
     loadInspections();
@@ -120,6 +126,37 @@ export default function RestaurantDetailScreen() {
       });
     } catch (error) {
       console.error('Share error:', error);
+    }
+  }
+
+  async function handleSave() {
+    if (saving) return;
+    setSaving(true);
+
+    try {
+      const latest = inspections[0];
+      const nowSaved = await toggleSave({
+        establishment_id: establishmentId,
+        establishment_name: name,
+        establishment_address: address,
+        last_inspection_date: latest?.date,
+        last_score: safetyScore,
+      });
+
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      if (nowSaved) {
+        Alert.alert(
+          'Restaurant Saved',
+          "You'll get notified when this restaurant is inspected.",
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      Alert.alert('Error', 'Failed to save restaurant. Please try again.');
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -210,11 +247,27 @@ export default function RestaurantDetailScreen() {
           </View>
         </View>
 
-        {/* Share Button */}
-        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Ionicons name="share-outline" size={20} color="#FFFFFF" />
-          <Text style={styles.shareButtonText}>Share Report</Text>
-        </TouchableOpacity>
+        {/* Action Buttons */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity
+            style={[styles.saveButton, saved && styles.saveButtonActive]}
+            onPress={handleSave}
+            disabled={saving}
+          >
+            <Ionicons
+              name={saved ? 'heart' : 'heart-outline'}
+              size={20}
+              color={saved ? '#FFFFFF' : '#DC2626'}
+            />
+            <Text style={[styles.saveButtonText, saved && styles.saveButtonTextActive]}>
+              {saved ? 'Saved' : 'Save'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+            <Ionicons name="share-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.shareButtonText}>Share</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Findings */}
         {latest && latest.infractions.length > 0 && (
@@ -432,13 +485,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#4A4640',
   },
+  actionButtons: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginTop: 16,
+    gap: 12,
+  },
+  saveButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#DC2626',
+    borderRadius: 12,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  saveButtonActive: {
+    backgroundColor: '#DC2626',
+    borderColor: '#DC2626',
+  },
+  saveButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#DC2626',
+  },
+  saveButtonTextActive: {
+    color: '#FFFFFF',
+  },
   shareButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#2D5A3D',
-    marginHorizontal: 20,
-    marginTop: 16,
     borderRadius: 12,
     paddingVertical: 14,
     gap: 8,

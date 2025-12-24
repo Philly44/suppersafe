@@ -11,10 +11,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { searchRestaurants, Restaurant } from '../services/supabase';
+import { useSaved } from '../contexts/SavedContext';
 
 export default function SearchScreen() {
   const navigation = useNavigation<any>();
+  const { isSaved, toggleSave } = useSaved();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +69,22 @@ export default function SearchScreen() {
     });
   }
 
+  async function handleSave(restaurant: Restaurant) {
+    try {
+      await toggleSave({
+        establishment_id: restaurant.establishment_id,
+        establishment_name: restaurant.establishment_name,
+        establishment_address: restaurant.establishment_address,
+      });
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (error) {
+      console.error('Save error:', error);
+    }
+  }
+
   function renderRestaurant({ item }: { item: Restaurant }) {
+    const saved = isSaved(item.establishment_id);
+
     return (
       <TouchableOpacity
         style={styles.resultItem}
@@ -77,6 +95,17 @@ export default function SearchScreen() {
           <Text style={styles.resultName}>{item.establishment_name}</Text>
           <Text style={styles.resultAddress}>{item.establishment_address}</Text>
         </View>
+        <TouchableOpacity
+          style={styles.heartButton}
+          onPress={() => handleSave(item)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name={saved ? 'heart' : 'heart-outline'}
+            size={22}
+            color={saved ? '#DC2626' : '#A09A8F'}
+          />
+        </TouchableOpacity>
         <Ionicons name="chevron-forward" size={20} color="#A09A8F" />
       </TouchableOpacity>
     );
@@ -194,6 +223,10 @@ const styles = StyleSheet.create({
   resultAddress: {
     fontSize: 14,
     color: '#6B665C',
+  },
+  heartButton: {
+    padding: 8,
+    marginRight: 4,
   },
   separator: {
     height: 8,
