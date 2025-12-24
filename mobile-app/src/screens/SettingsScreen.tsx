@@ -1,12 +1,72 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  registerForPushNotifications,
+  savePushToken,
+  removePushToken,
+  getNotificationStatus,
+} from '../services/notifications';
 
 export default function SettingsScreen() {
   const { user, signOut, isFoundingMember } = useAuth();
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+
+  useEffect(() => {
+    checkNotificationStatus();
+  }, []);
+
+  async function checkNotificationStatus() {
+    try {
+      const enabled = await getNotificationStatus();
+      setNotificationsEnabled(enabled);
+    } catch (error) {
+      console.error('Error checking notification status:', error);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }
+
+  async function handleNotificationToggle(enabled: boolean) {
+    setNotificationsLoading(true);
+
+    try {
+      if (enabled) {
+        // Request permissions and register token
+        const token = await registerForPushNotifications();
+
+        if (token) {
+          await savePushToken(token);
+          setNotificationsEnabled(true);
+          Alert.alert(
+            'Notifications Enabled',
+            "You'll receive alerts when your saved restaurants are inspected."
+          );
+        } else {
+          Alert.alert(
+            'Permission Required',
+            'Please enable notifications in your device settings to receive restaurant alerts.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => Linking.openSettings() },
+            ]
+          );
+        }
+      } else {
+        // Remove token
+        await removePushToken();
+        setNotificationsEnabled(false);
+      }
+    } catch (error) {
+      console.error('Error toggling notifications:', error);
+      Alert.alert('Error', 'Failed to update notification settings. Please try again.');
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }
 
   function handleSignOut() {
     Alert.alert(
@@ -54,12 +114,16 @@ export default function SettingsScreen() {
                 <Text style={styles.settingDesc}>Get alerts for saved restaurants</Text>
               </View>
             </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#E8E4DD', true: '#2D5A3D' }}
-              thumbColor="#FFFFFF"
-            />
+            {notificationsLoading ? (
+              <ActivityIndicator size="small" color="#2D5A3D" />
+            ) : (
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={handleNotificationToggle}
+                trackColor={{ false: '#E8E4DD', true: '#2D5A3D' }}
+                thumbColor="#FFFFFF"
+              />
+            )}
           </View>
         </View>
 
